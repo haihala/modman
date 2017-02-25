@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import os, glob, re, requests, json, urllib, sys, subprocess
+import os, glob, re, requests, json, urllib, sys, subprocess, base64
 
 # Helpers
 def open_file(filename):
@@ -95,6 +95,26 @@ def edit(arg):
         f.close()
     open_file(ps.join([getPath("modpacks") , arg+".txt"]))
 
+# Compression function
+def compress(name):
+    for fname in glob.glob(getPath("modpacks") + "/*"):
+        pack = fname.split(getPathSeparator())[-1][:-4]
+        if pack == name:
+            f = open(fname, "rb")
+            print(base64.b64encode(bytes(pack, "UTF-8")+bytes('\n', "UTF-8")+f.read()))
+            f.close()
+            return
+
+    print("No such pack: " + name)
+
+def decompress(base64name):
+    bt = str(base64.b64decode(base64name))
+    name = str(bt.split("\\n")[0])[2:]
+    content = str("\n".join(bt.split("\\n")[1:]))[:-1]
+    f = open(getPath("modpacks") + getPathSeparator() + name + ".txt", "w")
+    f.write(content)
+    f.close()
+    print("Succesfully wrote to modpack " + name)
 
 # Install function
 def install(args):
@@ -142,6 +162,10 @@ def main():
             listpacks(cmds[1:])
         elif cmd == "edit":
             edit(cmds[1])
+        elif cmd == "compress":
+            compress(cmds[1])
+        elif cmd == "decompress":
+            decompress(cmds[1])
         elif cmd == "install":
             install(cmds[1:])
         else:
