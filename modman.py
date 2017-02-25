@@ -22,6 +22,10 @@ def getPath(fname):
 def getFolder():
     f = open(getPath("modman.conf"))
     ret = [i for i in f.readlines() if i[0] != "#" and i != ""][0].strip()
+
+    ps = getPathSeparator()
+    if ret[-1] != ps:
+        ret += ps
     f.close()
     return ret
 
