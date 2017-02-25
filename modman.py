@@ -59,11 +59,11 @@ Actions:
     'install' <modpack name: Despite what is in the mod folder, downloads the newest mods into the specified folder""")
     elif subj == ["list"] or subj == ["listpacks"]:
         print("""LIST:
-Lists all modpack files in utils/saves/modpacks/ by name.
+Lists all modpack files in modpacks by name.
 If an argument is provided, ill list all mods in the specified pack or return "No such pack".""")
     elif subj == ["edit"]:
         print("""EDIT:
-Takes a modpack as an argument. Opens the corresponding modpack file in utils/saves/modpacks/<modpack>.txt""")
+Takes a modpack as an argument. Opens the corresponding modpack file in modpacks/<modpack>.txt. If file doesn't exits, a default 'template' will be created and opened.""")
     elif subj == ["install"]:
         print("""INSTALL:
 Takes a modpack(s) as an argument. Will delete all ".zip" files in the designated mod folder and download newes versions of the mods specified in the pack file(s).""")
@@ -87,7 +87,13 @@ def listpacks(args):
 # Edit function
 def edit(arg):
     ps = getPathSeparator()
-    open_file(getUtilsPath() + ps.join(["saves", "modpacks", arg+".txt"]))
+    if (arg not in getSaves()):
+        f = open(ps.join([getPath("modpacks") , arg+".txt"]), "w")
+        f.write("""# Comments are allowed
+# Mods are listed in any order by name in mods.factorio.com url
+""")
+        f.close()
+    open_file(ps.join([getPath("modpacks") , arg+".txt"]))
 
 
 # Install function
