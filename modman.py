@@ -56,6 +56,8 @@ Actions:
     'help' <action> : If action is present, prints detailed information of the action, otherwise this help message is printed
     'list' or 'listpacks': Lists all available
     'edit' <modpack name> : Opens the specified pack in default text editor
+    'compress' <modpack name> : Makes a base64 hash of the mentioned modpack
+    'decompress' <base64 modpack provided by compress> : Unpacks the base64 modpack into modpack folder. It now works like the rest of them. Warning: Overrides existing modpacks with the same name.
     'install' <modpack name: Despite what is in the mod folder, downloads the newest mods into the specified folder""")
     elif subj == ["list"] or subj == ["listpacks"]:
         print("""LIST:
@@ -64,6 +66,12 @@ If an argument is provided, ill list all mods in the specified pack or return "N
     elif subj == ["edit"]:
         print("""EDIT:
 Takes a modpack as an argument. Opens the corresponding modpack file in modpacks/<modpack>.txt. If file doesn't exits, a default 'template' will be created and opened.""")
+    elif subj == ["compress"]:
+        print("""COMPRESS:
+Takes a modpack(s) as an argument. Will provide the user with a base64 representation of the modpack. This base64 can be used to decompress it to a real modpack.""")
+    elif subj == ["decompress"]:
+        print("""DECOMPRESS:
+Takes a base64 modpack representation as an argument. Will unpack the modpack and save it into the modpack folder. If a pack with the same name exists, will override it.""")
     elif subj == ["install"]:
         print("""INSTALL:
 Takes a modpack(s) as an argument. Will delete all ".zip" files in the designated mod folder and download newes versions of the mods specified in the pack file(s).""")
