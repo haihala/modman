@@ -14,6 +14,14 @@ After installation, run the script, It will tell you what to do.
 
 After you downloaded the repository and installed the dependencies, you only need to specify your mod folder location. If you try to run the script, it will open the config file in your default editor. you need to replace "Change this!" with the location of your factorio mod folder. Once this is done, re-run the script and it will tell you how it works
 
+## Modpack format.
+
+The modpack files stored in the modpack folder are all normal .txt files. The parser ignores empty lines and lines beginning with "#" (comments). All non-comment non-empty lines are interpreted as mod names.
+
+Mod names come from the mod portal. If you for example want to include a mod called Foo made by bar, the mod portal url should be: https://mods.factorio.com/mods/bar/Foo and you should add "Foo" to the modpack file.
+
+There should only be one mod per line and the mod names are case specific.
+
 
 ## Notes
 You can freely copy modpack files around, they are just lines of text with mod names.
