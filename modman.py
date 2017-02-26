@@ -48,7 +48,7 @@ Actions:
     'edit' <modpack name> : Opens the specified pack in default text editor
     'compress' <modpack name> : Makes a base64 hash of the mentioned modpack
     'decompress' <base64 modpack provided by compress> : Unpacks the base64 modpack into modpack folder. It now works like the rest of them. Warning: Overrides existing modpacks with the same name.
-    'install' <modpack name: Despite what is in the mod folder, downloads the newest mods into the specified folder""")
+    'install' <modpack name>: Despite what is in the mod folder, downloads the newest mods into the specified folder""")
     elif subj == ["list"] or subj == ["listpacks"]:
         print("""LIST:
 Lists all modpack files in modpacks by name.
