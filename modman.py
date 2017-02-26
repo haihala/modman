@@ -1,40 +1,48 @@
 #!/usr/bin/env python3
-import os, glob, re, requests, json, urllib, sys, subprocess, base64
+import os, glob, re, json, urllib, sys, subprocess, base64
+
+if sys.version_info[0] != 3:
+    print("This program requires Python 3.")
+    print("You can get it from https://www.python.org/downloads/")
+    exit(1)
+
+try:
+    import requests
+except ImportError:
+    print("It looks like requests is not installed.")
+    print("Try this: pip3 install requests")
+    exit(1)
 
 # Helpers
-def open_file(filename):
+def open_file_gui(filename):
     if sys.platform == "win32":
         os.startfile(filename)
     else:
-        opener ="open" if sys.platform == "darwin" else "xdg-open"
+        opener = "open" if sys.platform == "darwin" else "xdg-open"
         subprocess.call([opener, filename])
 
-def getPathSeparator():
-    if sys.platform == "win32":
-        return "\\"
-    else:
-        return "/"
+def get_relative_path(fname):
+    return os.path.join(os.path.split(os.path.realpath(__file__))[0], fname)
 
-def getPath(fname):
-    ps = getPathSeparator()
-    return ps.join([*os.path.realpath(__file__).split(ps)[:-1], fname])
+def get_factorio_folder():
+    with open(get_relative_path("modman.conf")) as f:
+        ret = [i for i in f.readlines() if i[0] != "#" and i != ""][0].strip()
 
-def getFolder():
-    f = open(getPath("modman.conf"))
-    ret = [i for i in f.readlines() if i[0] != "#" and i != ""][0].strip()
+        if not ret.endswith(os.sep):
+            ret += os.sep
 
-    ps = getPathSeparator()
-    if ret[-1] != ps:
-        ret += ps
-    f.close()
+    if not os.path.isdir(ret):
+        print("Could not find your factorio directory!")
+        print("Remember to set it on modman.conf")
+        exit(1)
+
     return ret
 
-def getSaves():
+def get_saves():
     saves = {}
-    for fname in glob.glob(getPath("modpacks") + "/*"):
-        f = open(fname)
-        saves[fname.split(getPathSeparator())[-1][:-4]] = [i.strip() for i in f.readlines() if i != "" and i[0] != "#"]
-        f.close()
+    for fname in glob.glob(get_relative_path("modpacks") + "/*"):
+        with open(fname) as f:
+            saves[os.path.split(fname)[-1][:-4]] = [i.strip() for i in f.readlines() if i != "" and i[0] != "#"]
     return saves
 
 def download_file(url, folder):
@@ -48,7 +56,7 @@ def download_file(url, folder):
 
 
 # Help function
-def getHelp(subj):
+def get_help(subj):
     if subj == [] or subj == ["help"]:
         print ("""Usage: ./modman.py [action]
 
@@ -58,7 +66,7 @@ Actions:
     'edit' <modpack name> : Opens the specified pack in default text editor
     'compress' <modpack name> : Makes a base64 hash of the mentioned modpack
     'decompress' <base64 modpack provided by compress> : Unpacks the base64 modpack into modpack folder. It now works like the rest of them. Warning: Overrides existing modpacks with the same name.
-    'install' <modpack name: Despite what is in the mod folder, downloads the newest mods into the specified folder""")
+    'install' <modpack name>: Despite what is in the mod folder, downloads the newest mods into the specified folder""")
     elif subj == ["list"] or subj == ["listpacks"]:
         print("""LIST:
 Lists all modpack files in modpacks by name.
@@ -80,10 +88,10 @@ Takes a modpack(s) as an argument. Will delete all ".zip" files in the designate
 # List function
 def listpacks(args):
     if args == []:
-        for i in getSaves():
+        for i in get_saves():
             print(i)
 
-    packs = getSaves()
+    packs = get_saves()
     for pack in args:
         print(pack)
         if (pack in packs):
@@ -94,46 +102,40 @@ def listpacks(args):
 
 # Edit function
 def edit(arg):
-    ps = getPathSeparator()
-    if (arg not in getSaves()):
-        f = open(ps.join([getPath("modpacks") , arg+".txt"]), "w")
-        f.write("""# Comments are allowed
-# Mods are listed in any order by name in mods.factorio.com url
-""")
-        f.close()
-    open_file(ps.join([getPath("modpacks") , arg+".txt"]))
+    if (arg not in get_saves()):
+        with open(os.path.join(get_relative_path("modpacks"), arg+".txt"), "w") as f:
+            f.write("# Comments are allowed\n# Mods are listed in any order by name in mods.factorio.com url")
+    open_file_gui(os.path.join(get_relative_path("modpacks") , arg+".txt"))
 
 # Compression function
 def compress(name):
-    for fname in glob.glob(getPath("modpacks") + "/*"):
-        pack = fname.split(getPathSeparator())[-1][:-4]
+    for fname in glob.glob(get_relative_path("modpacks") + "/*"):
+        pack = os.path.split(fname)[-1][:-4]
         if pack == name:
-            f = open(fname, "rb")
-            print(base64.b64encode(bytes(pack, "UTF-8")+bytes('\n', "UTF-8")+f.read()))
-            f.close()
-            return
-
-    print("No such pack: " + name)
+            with open(fname, "rb") as f:
+                print(base64.b64encode(bytes(pack, "UTF-8")+bytes('\n', "UTF-8")+f.read()))
+            break
+    else:
+        print("No such pack: " + name)
 
 def decompress(base64name):
     bt = str(base64.b64decode(base64name))
     name = str(bt.split("\\n")[0])[2:]
     content = str("\n".join(bt.split("\\n")[1:]))[:-1]
-    f = open(getPath("modpacks") + getPathSeparator() + name + ".txt", "w")
-    f.write(content)
-    f.close()
+    with open(os.path.join(get_relative_path("modpacks"), name+".txt"), "w"):
+        f.write(content)
     print("Succesfully wrote to modpack " + name)
 
 # Install function
 def install(args):
-    modsFolder = getFolder()
+    modsFolder = get_factorio_folder()
     # Delete old mods
     print("Deleting mods in: " + modsFolder)
-    for i in glob.glob(getFolder() + "*.zip"):
+    for i in glob.glob(get_factorio_folder() + "*.zip"):
         os.remove(i)
 
     # Install new mods
-    packs = getSaves()
+    packs = get_saves()
     installs = set()
     for pack in args:
         if (pack in packs):
@@ -157,15 +159,15 @@ def install(args):
 
 
 def main():
-    if (getFolder() == "Change this!"):
-        open_file(getPath("modman.conf"))
+    if (get_factorio_folder() == "Change this!"):
+        open_file_gui(get_relative_path("modman.conf"))
         return
 
     cmds = sys.argv[1:]
     if len(cmds) >= 2:
         cmd = cmds[0]
         if cmd == "help":
-            getHelp(cmds[1:])
+            get_help(cmds[1:])
         elif cmd == "list" or cmd == "listpacks":
             listpacks(cmds[1:])
         elif cmd == "edit":
@@ -177,12 +179,12 @@ def main():
         elif cmd == "install":
             install(cmds[1:])
         else:
-            getHelp([])
+            get_help([])
     else:
         if len(cmds) == 1 and (cmds[0] == "list" or cmds[0] == "listpacks"):
             listpacks([])
         else:
-            getHelp([])
+            get_help([])
 
 if __name__ == '__main__':
     main()
