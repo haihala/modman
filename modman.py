@@ -21,11 +21,11 @@ def open_file_gui(filename):
         opener = "open" if sys.platform == "darwin" else "xdg-open"
         subprocess.call([opener, filename])
 
-def get_relative_path(fname):
+def get_absolute_path(fname):
     return os.path.join(os.path.split(os.path.realpath(__file__))[0], fname)
 
 def get_factorio_folder():
-    with open(get_relative_path("modman.conf")) as f:
+    with open(get_absolute_path("modman.conf")) as f:
         ret = [i for i in f.readlines() if i[0] != "#" and i != ""][0].strip()
 
         if not ret.endswith(os.sep):
@@ -40,7 +40,7 @@ def get_factorio_folder():
 
 def get_saves():
     saves = {}
-    for fname in glob.glob(get_relative_path("modpacks") + "/*"):
+    for fname in glob.glob(get_absolute_path("modpacks") + "/*"):
         with open(fname) as f:
             saves[os.path.split(fname)[-1][:-4]] = [i.strip() for i in f.readlines() if i != "" and i[0] != "#"]
     return saves
@@ -103,13 +103,13 @@ def listpacks(args):
 # Edit function
 def edit(arg):
     if (arg not in get_saves()):
-        with open(os.path.join(get_relative_path("modpacks"), arg+".txt"), "w") as f:
+        with open(os.path.join(get_absolute_path("modpacks"), arg+".txt"), "w") as f:
             f.write("# Comments are allowed\n# Mods are listed in any order by name in mods.factorio.com url")
-    open_file_gui(os.path.join(get_relative_path("modpacks") , arg+".txt"))
+    open_file_gui(os.path.join(get_absolute_path("modpacks") , arg+".txt"))
 
 # Compression function
 def compress(name):
-    for fname in glob.glob(get_relative_path("modpacks") + "/*"):
+    for fname in glob.glob(get_absolute_path("modpacks") + "/*"):
         pack = os.path.split(fname)[-1][:-4]
         if pack == name:
             with open(fname, "rb") as f:
@@ -122,7 +122,7 @@ def decompress(base64name):
     bt = str(base64.b64decode(base64name))
     name = str(bt.split("\\n")[0])[2:]
     content = str("\n".join(bt.split("\\n")[1:]))[:-1]
-    with open(os.path.join(get_relative_path("modpacks"), name+".txt"), "w"):
+    with open(os.path.join(get_absolute_path("modpacks"), name+".txt"), "w"):
         f.write(content)
     print("Succesfully wrote to modpack " + name)
 
@@ -131,7 +131,7 @@ def install(args):
     modsFolder = get_factorio_folder()
     # Delete old mods
     print("Deleting mods in: " + modsFolder)
-    for i in glob.glob(get_factorio_folder() + "*.zip"):
+    for i in glob.glob(modsFolder + "*.zip"):
         os.remove(i)
 
     # Install new mods
@@ -160,7 +160,7 @@ def install(args):
 
 def main():
     if (get_factorio_folder() == "Change this!"):
-        open_file_gui(get_relative_path("modman.conf"))
+        open_file_gui(get_absolute_path("modman.conf"))
         return
 
     cmds = sys.argv[1:]
