@@ -30,6 +30,12 @@ def get_factorio_folder():
 
         if not ret.endswith(os.sep):
             ret += os.sep
+
+    if not os.path.isdir(ret):
+        print("Could not find your factorio directory!")
+        print("Remember to set it on modman.conf")
+        exit(1)
+
     return ret
 
 def get_saves():
