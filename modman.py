@@ -149,9 +149,11 @@ def install(args):
 
     for i in installs:
         r = requests.get("https://mods.factorio.com/api/mods/" + i)
-        if r.status_code != 200:
-            break
         parsed = json.loads(r.text)
+        if len(parsed.keys()) == 1:
+            if parsed["detail"] == "Not found.":
+                print("Mod '" + i + "' could not be found.")
+                continue
         url = parsed["releases"][0]["download_url"]
         url = "https://mods.factorio.com" + url
         print("Downloading: " + url)
