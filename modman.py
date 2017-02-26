@@ -1,5 +1,17 @@
 #!/usr/bin/env python3
-import os, glob, re, requests, json, urllib, sys, subprocess, base64
+import os, glob, re, json, urllib, sys, subprocess, base64
+
+if sys.version_info[0] != 3:
+    print("This program requires Python 3.")
+    print("You can get it from https://www.python.org/downloads/")
+    exit(1)
+
+try:
+    import requests
+except ImportError:
+    print("It looks like requests is not installed.")
+    print("Try this: pip3 install requests")
+    exit(1)
 
 # Helpers
 def open_file_gui(filename):
