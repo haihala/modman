@@ -1,5 +1,6 @@
-#!/usr/bin/env.exe python
+#!python
 import os, glob, re, json, urllib, sys, subprocess, base64
+from cache import *
 
 if sys.version_info[0] != 3:
     print("This program requires Python 3.")
@@ -34,7 +35,7 @@ def get_factorio_folder():
     if not os.path.isdir(ret):
         print("Could not find your factorio directory!")
         print("Remember to set it on modman.conf")
-        exit(1)
+        return  # Return and not exit for first check. If program exits, editor is not opened.
 
     return ret
 
@@ -53,7 +54,6 @@ def download_file(url, folder):
             if chunk: # filter out keep-alive new chunks
                 f.write(chunk)
     return local_filename
-
 
 # Help function
 def get_help(subj):
@@ -129,10 +129,13 @@ def decompress(base64name):
 # Install function
 def install(args):
     modsFolder = get_factorio_folder()
-    # Delete old mods
-    print("Deleting mods in: " + modsFolder)
-    for i in glob.glob(modsFolder + "*.zip"):
-        os.remove(i)
+
+    # Initialize the cache
+    cache = Cache(modsFolder)
+
+    # Handle old mods
+    print("Caching mods in: " + modsFolder)
+    cache.cache([os.path.split(i)[1] for i in glob.glob(modsFolder + "*.zip")])
 
     # Install new mods
     packs = get_saves()
@@ -144,8 +147,12 @@ def install(args):
         else:
             print("No such pack: " + pack)
 
-    print("Preparing to install: ", end='')
-    print(installs)
+    if installs == set():
+        print("Nothing to install, quitting")
+        exit(0)
+    else:
+        print("Preparing to install: ", end='')
+        print(installs)
 
     for i in installs:
         r = requests.get("https://mods.factorio.com/api/mods/" + i)
@@ -154,10 +161,14 @@ def install(args):
             if parsed["detail"] == "Not found.":
                 print("Mod '" + i + "' could not be found.")
                 continue
-        url = parsed["releases"][0]["download_url"]
-        url = "https://mods.factorio.com" + url
-        print("Downloading: " + url)
-        download_file(url, modsFolder)
+        release = parsed["releases"][0]  # 0 for newest
+        if cache.version(i, release["version"]):  # If mod is in cache, get it.
+            cache.fetch(i)
+        else:
+            url = release["download_url"]
+            url = "https://mods.factorio.com" + url
+            print("Downloading: " + url)
+            download_file(url, modsFolder)
 
 
 def main():
