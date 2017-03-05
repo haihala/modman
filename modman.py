@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env.exe python
 import os, glob, re, json, urllib, sys, subprocess, base64
 
 if sys.version_info[0] != 3:
