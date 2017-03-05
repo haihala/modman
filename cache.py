@@ -88,7 +88,9 @@ class Cache():
             os.remove(os.path.join(self.check_folder(), "_".join(newest)+".zip"))
 
         newest = mods[0]
-        shutil.copy(os.path.join(self.check_folder(), "_".join(newest)+".zip"), self.modsFolder)
+        fname = "_".join(newest)+".zip"
+        print("Fetching from cache: " + fname)
+        shutil.copy(os.path.join(self.check_folder(), fname), self.modsFolder)
 
 if __name__ == '__main__':
     c = Cache("C:\\Users\\revol\\AppData\\Roaming\\Factorio\\mods")
