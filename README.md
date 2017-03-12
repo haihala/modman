@@ -6,14 +6,17 @@ After installation, run eihter "gui.py" or "modman.py", where the latter is a te
 
 ## Installation:
 
-Installation is identical on both versions the headless and gui versions.
-
 ### Dependencies:
 * Python3
     * Install from https://www.python.org/downloads/
 * Python3 requests
     * After installing python3:
         * "pip3 install requests" in terminal/cmd
+
+#### for gui
+* Python3 PyQt5
+    * After installing python3:
+        * "pip3 install PyQt5" in terminal/cmd
 
 After you downloaded the repository and installed the dependencies, you only need to specify your mod folder location. If you try to run the script, it will open the config file in your default editor. you need to replace "Change this!" with the location of your factorio mod folder. Once this is done, re-run the script and it will tell you how it works
 
