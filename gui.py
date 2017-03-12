@@ -18,14 +18,13 @@ def add_pack(name):
     with open(os.path.join(get_absolute_path("modpacks"), name+".txt"), 'a') as f:
         pass
 
-def modify_pack(pack_name, text):
+def modify_pack(name, text):
     with open(os.path.join(get_absolute_path("modpacks"), name+".txt"), "w") as f:
         f.write(text)
 
 def get_mods_of_pack(name):
     with open(os.path.join(get_absolute_path("modpacks"), name+".txt"), "r") as f:
         return f.read()
-
 
 class App(QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -42,7 +41,7 @@ class App(QMainWindow, Ui_MainWindow):
         self.install_pack_button.clicked.connect(self.install_pack)
 
         # Mods list
-        self.mod_list.currentItemChanged.connect(self.load_mod)
+        self.mod_list.itemClicked.connect(self.load_mod)
 
         # Menubar items
         # File
@@ -66,6 +65,8 @@ class App(QMainWindow, Ui_MainWindow):
 
     # Actions
     def save(self):
+        if not self.selected_pack():
+            self.save_as()
         # Get current editor text and transfer it into the currently selected pack file.
         modify_pack(self.selected_pack(), self.mod_text_edit.toPlainText())
 
@@ -107,30 +108,26 @@ class App(QMainWindow, Ui_MainWindow):
             self.mod_list.setCurrentRow(self.mod_list.count()-1)
 
     def add_string_pack(self):
-        print("Add pack string")
+        name = self.get_string_popup("Pack hash")
+        if name:
+            self.shell_exec("decompress " + name)
 
     def install_pack(self):
         if not self.selected_pack():
             error("No pack selected")
             return
-        print("Install pack " + self.selected_pack())
+        self.shell_exec("install " + self.selected_pack())
 
     def pack_string(self):
-        print("Pack string")
-        print(self.shell_exec("list"))
-
+        if not self.selected_pack():
+            error("No pack selected")
+            return
+        b64 = str(self.shell_exec("compress " + self.selected_pack())[0])[2:]
+        self.mod_text_edit.setPlainText("# Compressed string of " + self.selected_pack() + "\n\n" + b64)
+        self.mod_list.clearSelection()
     # Helpers
     def selected_pack(self):
         return self.mod_list.currentItem().data(0)
-
-    def mods_in_pack(self, nxt = ""):
-        # If nxt is default argument, function is a getter, otherwise it is setter
-        if nxt == "":
-            # Get mods in current packs
-            pass
-        else:
-            # Set mods to current pack
-            pass
 
     def open_folder(self, path):
         if platform.system() == "Windows":
@@ -149,7 +146,6 @@ class App(QMainWindow, Ui_MainWindow):
 
         if ok:
             return str(text)
-
 
 if __name__ == "__main__":
     if (get_factorio_folder() == "Change this!"):
