@@ -14,18 +14,18 @@ def error(arg):
     """Eventually graphical error message display function"""
     print(arg)
 
-class String_popup(QWidget):
-    def __init__(self, name, parent):
-        super().__init__()
-        self.name = name
-        self.setWindowTitle(name)
-        layout = QGridLayout(self)
-        self.textBox = QLineEdit()
-        self.textBox.returnPressed.connect(self.submit)
-        layout.addWidget(self.textBox)
+def add_pack(name):
+    with open(os.path.join(get_absolute_path("modpacks"), name+".txt"), 'a') as f:
+        pass
 
-    def submit(self):
-        print(self.textBox.text())
+def modify_pack(pack_name, text):
+    with open(os.path.join(get_absolute_path("modpacks"), name+".txt"), "w") as f:
+        f.write(text)
+
+def get_mods_of_pack(name):
+    with open(os.path.join(get_absolute_path("modpacks"), name+".txt"), "r") as f:
+        return f.read()
+
 
 class App(QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -67,15 +67,16 @@ class App(QMainWindow, Ui_MainWindow):
     # Actions
     def save(self):
         # Get current editor text and transfer it into the currently selected pack file.
-        print("Save")
+        modify_pack(self.selected_pack(), self.mod_text_edit.toPlainText())
 
     def save_as(self):
         # Get current editor text and open a dialog to name the new modpack that has the following mods.
-        print("Save as")
+        self.add_pack()
+        self.save()
 
     def load_mod(self):
         # Fill editor with currently selected modpack
-        print("Load modpack " + self.selected_pack())
+        self.mod_text_edit.setPlainText(get_mods_of_pack(self.selected_pack()))
 
     def mods(self):
         # Open mods folder
@@ -97,8 +98,13 @@ class App(QMainWindow, Ui_MainWindow):
             self.mod_list.addItem(tmp)
 
     def add_pack(self):
-        print("Add pack")
-        self.get_string_popup("Pack name")
+        name = self.get_string_popup("Pack name")
+        if name:
+            add_pack(name)
+            tmp = QListWidgetItem()
+            tmp.setText(name)
+            self.mod_list.addItem(tmp)
+            self.mod_list.setCurrentRow(self.mod_list.count()-1)
 
     def add_string_pack(self):
         print("Add pack string")
@@ -138,8 +144,11 @@ class App(QMainWindow, Ui_MainWindow):
         return [i.strip() for i in os.popen(get_absolute_path("modman.py") + " " + cmd).readlines()]
 
     def get_string_popup(self, name):
-        self.strPopup = String_popup(name, self)
-        self.strPopup.show()
+        text, ok = QInputDialog.getText(self, 'Input Dialog',
+            name+':')
+
+        if ok:
+            return str(text)
 
 
 if __name__ == "__main__":
