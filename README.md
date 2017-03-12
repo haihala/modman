@@ -2,7 +2,7 @@
 Factorio command line mod manager.
 
 ## Usage:
-After installation, run eihter "gui.py" or "modman.py", where the latter is a text based user interface that will tell you what to do. Gui tutorial is below.
+After installation, run eihter "gui.py" or "modman.py", where the latter is a text based user interface that will tell you what to do. Gui tutorial is below. Gui can be started by double clicking gui.py after python3 and requests have been installed.
 
 ## Installation:
 
