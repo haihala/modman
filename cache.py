@@ -68,7 +68,7 @@ class Cache():
             return True
 
         # Newest cached version is old as well.
-        os.remove(os.path.join(self.check_folder(), mods[0][0]))
+        os.remove(mods[0][0]+"_"+mods[0][1]+".zip")
         return False
 
     def fetch(self, modname):
