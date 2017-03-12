@@ -22,6 +22,12 @@ def open_file_gui(filename):
         opener = "open" if sys.platform == "darwin" else "xdg-open"
         subprocess.call([opener, filename])
 
+def line_separator():
+    if sys.platform == "win32":
+        return "\\r\\n"
+    else:
+        return "\\n"
+
 def get_absolute_path(fname):
     return os.path.join(os.path.split(os.path.realpath(__file__))[0], fname)
 
@@ -104,7 +110,7 @@ def listpacks(args):
 def edit(arg):
     if (arg not in get_saves()):
         with open(os.path.join(get_absolute_path("modpacks"), arg+".txt"), "w") as f:
-            f.write("# Comments are allowed\n# Mods are listed in any order by name in mods.factorio.com url")
+            f.write("# Comments are allowed" + line_separator() + "# Mods are listed in any order by name in mods.factorio.com url" + line_separator())
     open_file_gui(os.path.join(get_absolute_path("modpacks") , arg+".txt"))
 
 # Compression function
@@ -113,16 +119,16 @@ def compress(name):
         pack = os.path.split(fname)[-1][:-4]
         if pack == name:
             with open(fname, "rb") as f:
-                print(base64.b64encode(bytes(pack, "UTF-8")+bytes('\n', "UTF-8")+f.read()))
+                print(base64.b64encode(bytes(pack, "UTF-8")+bytes(line_separator(), "UTF-8")+f.read()))
             break
     else:
         print("No such pack: " + name)
 
 def decompress(base64name):
     bt = str(base64.b64decode(base64name))
-    name = str(bt.split("\\n")[0])[2:]
-    content = str("\n".join(bt.split("\\n")[1:]))[:-1]
-    with open(os.path.join(get_absolute_path("modpacks"), name+".txt"), "w"):
+    name = str(bt.split(line_separator())[0])[2:]
+    content = str(line_separator().join(bt.split(line_separator())[1:]))[:-1]
+    with open(os.path.join(get_absolute_path("modpacks"), name+".txt"), "w") as f:
         f.write(content)
     print("Succesfully wrote to modpack " + name)
 

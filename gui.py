@@ -111,6 +111,7 @@ class App(QMainWindow, Ui_MainWindow):
         name = self.get_string_popup("Pack hash")
         if name:
             self.shell_exec("decompress " + name)
+        self.load_packs()
 
     def install_pack(self):
         if not self.selected_pack():
@@ -122,7 +123,7 @@ class App(QMainWindow, Ui_MainWindow):
         if not self.selected_pack():
             error("No pack selected")
             return
-        b64 = str(self.shell_exec("compress " + self.selected_pack())[0])[2:]
+        b64 = str(self.shell_exec("compress " + self.selected_pack())[0])[2:-1]
         self.mod_text_edit.setPlainText("# Compressed string of " + self.selected_pack() + "\n\n" + b64)
         self.mod_list.clearSelection()
     # Helpers
