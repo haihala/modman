@@ -13,7 +13,7 @@ After installation, run eihter "gui.py" or "modman.py", where the latter is a te
     * After installing python3:
         * "pip3 install requests" in terminal/cmd
 
-#### for gui
+#### For the GUI
 * Python3 PyQt5
     * After installing python3:
         * "pip3 install PyQt5" in terminal/cmd
@@ -61,10 +61,10 @@ Behavior is identical to the "Add a pack" button below mod list
 Decompress a pack compressed with "get as string". Useful for sharing packs.
 
 ##### Install
-Behavior is identical to the "Install" button below mod list
+Behavior is identical to the "Install" button below mod list.
 
-##### get as string
-Formes a hash of currently selected pack and changes the text in mod content box to show the user this hash.
+##### Get as string
+Forms a hash of currently selected pack and changes the text in mod content box to show the user this hash.
 
 ## Notes
 You can freely copy modpack files around, they are just lines of text with mod names.
@@ -73,4 +73,4 @@ You can add your own mod files and modify the current ones freely.
 
 Installing a pack deletes or caches all .zip files in your mod folder. This is good to know if you store something in there. This also makes it so, re-installing a pack updates all the mods.
 
-If you want, you can freely reach me on reddit /u/hajhawa. I will gladly respond to any tech problems you might have (I'm sure there will be plenty).
+If you want, you can freely reach me on reddit /u/hajhawa. I will gladly respond to any tech problems you might have (I'm sure there will be plenty). Alternatively, you could [open an issue on GitHub](https://github.com/haihala/modman/issues/new).
