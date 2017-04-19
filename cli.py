@@ -8,8 +8,7 @@ ACTIONS = [
     "edit <packname>",
     "compress <packname>",
     "decompress <base64>",
-    "install <packname>",
-    "update <packname>"
+    "install <packname>"
 ]
 
 HELP = {
@@ -18,8 +17,7 @@ HELP = {
     "edit": "Opens the specified pack in default text editor",
     "compress": "Makes a base64 digest of the mentioned modpack",
     "decompress": "Unpacks a mod from base64 digest (overrides existing modpacks with the same name)",
-    "install": "Despite what is in the mod folder, downloads the newest mods into the specified folder",
-    "update": "Updates given mod pack to newest version"
+    "install": "Despite what is in the mod folder, downloads the newest mods into the specified folder"
 }
 
 def get_action_names():
