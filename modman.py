@@ -41,7 +41,9 @@ def get_factorio_folder():
     if not os.path.isdir(ret):
         print("Could not find your factorio directory!")
         print("Remember to set it on modman.conf")
-        return  # Return and not exit for first check. If program exits, editor is not opened.
+
+        # Return and not exit for first check. If program exits, editor is not opened.
+        return None
 
     return ret
 
@@ -178,7 +180,7 @@ def install(args):
 
 
 def main():
-    if (get_factorio_folder() == "Change this!"):
+    if get_factorio_folder() is None:
         open_file_gui(get_absolute_path("modman.conf"))
         return
 
