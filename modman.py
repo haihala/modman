@@ -83,16 +83,16 @@ class ModPack(object):
         cache = Cache(mod_folder)
 
         # Handle old mods
-        cache.cache([fname for fname in os.listdir(mod_folder) if fname.endswith(".zip")])
+        cache.cache_all()
 
         # Install new mods
         for modname in self.contents:
             mod = mod_portal.Mod(modname)
 
             if mod.exists:
-                if cache.version(mod.name, mod.release):
+                if cache.version(mod, mod.release):
                      # If mod is in cache, get it.
-                    cache.fetch(mod.name)
+                    cache.fetch(mod)
                 else:
                     mod.download_to(mod_folder)
                     # TODO: progress message (using yield, maybe)
