@@ -1,30 +1,21 @@
 #!python
-import sys, os, platform, subprocess
-from modman import *
-from cache import *
+import sys
+import subprocess
+import os.path
 from PyQt5 import QtCore, uic
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-qtCreatorFile = "gui.ui" # Enter file here.
+import modman
+import cache
+import factorio_folder
 
-Ui_MainWindow, QtBaseClass = uic.loadUiType(qtCreatorFile)
+Ui_MainWindow, QtBaseClass = uic.loadUiType("gui.ui")
 
 def error(arg):
-    """Eventually graphical error message display function"""
+    """Display an error message."""
+    # TODO: show a graphical window
     print(arg)
-
-def add_pack(name):
-    with open(os.path.join(get_absolute_path("modpacks"), name+".txt"), 'a') as f:
-        pass
-
-def modify_pack(name, text):
-    with open(os.path.join(get_absolute_path("modpacks"), name+".txt"), "w") as f:
-        f.write(text)
-
-def get_mods_of_pack(name):
-    with open(os.path.join(get_absolute_path("modpacks"), name+".txt"), "r") as f:
-        return f.read()
 
 class App(QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -33,7 +24,7 @@ class App(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
 
         # Mod stuff
-        self.cache = Cache(get_factorio_folder())
+        self.cache = cache.Cache(factorio_folder.get())
 
         # UI elements
         # Buttons
@@ -65,10 +56,12 @@ class App(QMainWindow, Ui_MainWindow):
 
     # Actions
     def save(self):
-        if not self.selected_pack():
+        if not self.selected_pack:
             self.save_as()
+
         # Get current editor text and transfer it into the currently selected pack file.
-        modify_pack(self.selected_pack(), self.mod_text_edit.toPlainText())
+        self.selected_pack.edit(self.mod_text_edit.toPlainText().replace("\r\n", "\n").split("\n"))
+        self.selected_pack.save()
 
     def save_as(self):
         # Get current editor text and open a dialog to name the new modpack that has the following mods.
@@ -76,12 +69,12 @@ class App(QMainWindow, Ui_MainWindow):
         self.save()
 
     def load_mod(self):
-        # Fill editor with currently selected modpack
-        self.mod_text_edit.setPlainText(get_mods_of_pack(self.selected_pack()))
+        """Fill editor with currently selected modpack."""
+        self.mod_text_edit.setPlainText("\n".join(self.selected_pack.lines))
 
     def mods(self):
-        # Open mods folder
-        self.open_folder(get_factorio_folder())
+        """Open mods folder."""
+        self.open_folder(factorio_folder.get())
 
     def modpacks(self):
         # open modpacks folder
@@ -93,43 +86,52 @@ class App(QMainWindow, Ui_MainWindow):
 
     def load_packs(self):
         self.mod_list.clear()
-        for pack in self.shell_exec("list"):
+        for pack in modman.modpacks():
             tmp = QListWidgetItem()
-            tmp.setText(pack)
+            tmp.setText(pack.name)
             self.mod_list.addItem(tmp)
+        self.mod_list.sortItems()
 
     def add_pack(self):
         name = self.get_string_popup("Pack name")
         if name:
-            add_pack(name)
+            modman.ModPack(name).save()
+
             tmp = QListWidgetItem()
             tmp.setText(name)
             self.mod_list.addItem(tmp)
             self.mod_list.setCurrentRow(self.mod_list.count()-1)
+            self.mod_list.sortItems()
+            self.load_mod()
 
     def add_string_pack(self):
-        name = self.get_string_popup("Pack hash")
+        name = self.get_string_popup("Digest")
         if name:
-            self.shell_exec("decompress " + name)
+            modman.ModPack.decompress(args[0]).save()
         self.load_packs()
 
     def install_pack(self):
-        if not self.selected_pack():
+        if not self.selected_pack:
             error("No pack selected")
             return
-        self.shell_exec("install " + self.selected_pack())
+
+        self.selected_pack.install()
+
+        # TODO: show progress steps
+        # TODO: show message
 
     def pack_string(self):
-        if not self.selected_pack():
+        if not self.selected_pack:
             error("No pack selected")
             return
-        b64 = str(self.shell_exec("compress " + self.selected_pack())[0])[2:-1]
-        self.mod_text_edit.setPlainText("# Compressed string of " + self.selected_pack() + "\n\n" + b64)
+        self.mod_text_edit.setPlainText("# Digest string of " + self.selected_pack + "\n\n" + self.selected_pack.compress())
         self.mod_list.clearSelection()
-    # Helpers
-    def selected_pack(self):
-        return self.mod_list.currentItem().data(0)
 
+    @property
+    def selected_pack(self):
+        return modman.ModPack(self.mod_list.currentItem().data(0))
+
+    # Helpers
     def open_folder(self, path):
         if platform.system() == "Windows":
             os.startfile(path)
@@ -138,20 +140,13 @@ class App(QMainWindow, Ui_MainWindow):
         else:
             subprocess.Popen(["xdg-open", path])
 
-    def shell_exec(self, cmd):
-        return [i.strip() for i in os.popen(get_absolute_path("modman.py") + " " + cmd).readlines()]
-
     def get_string_popup(self, name):
-        text, ok = QInputDialog.getText(self, 'Input Dialog',
-            name+':')
+        text, ok = QInputDialog.getText(self, 'Input Dialog', name+':')
 
         if ok:
             return str(text)
 
 if __name__ == "__main__":
-    if (get_factorio_folder() == "Change this!"):
-        open_file_gui(get_absolute_path("modman.conf"))
-        exit(1)
     app = QApplication(sys.argv)
     window = App()
     window.show()

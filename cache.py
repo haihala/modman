@@ -14,7 +14,7 @@ class Cache():
             # ^ Truely beautiful
 
             # Change versions to ints for easier comparing
-            mod_info[1] = int("".join(mod_info[1].split(".")))
+            mod_info[1] = int("".join(mod_info[-1].split(".")))
             cached_mod_infos = [[i[0], int("".join(i[1].split("."))), i[0]+"_"+i[1]+".zip"] for i in cached_mod_infos]
 
 
