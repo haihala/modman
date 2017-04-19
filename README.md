@@ -18,7 +18,7 @@ After installation, run eihter "gui.py" or "modman.py", where the latter is a te
     * After installing python3:
         * "pip3 install PyQt5" in terminal/cmd
 
-After you downloaded the repository and installed the dependencies, you only need to specify your mod folder location. If you try to run the script, it will open the config file in your default editor. you need to replace "Change this!" with the location of your factorio mod folder. Once this is done, re-run the script and it will tell you how it works
+After you downloaded the repository and installed the dependencies, you only need to specify your mod folder location. If you try to run the script, it will open the config file in your default editor. You need to replace "Change this!" with the location of your factorio mod folder. Once this is done, re-run the script and it will tell you how it works
 
 ## Modpack format.
 
@@ -30,7 +30,7 @@ There should only be one mod per line and the mod names are case specific.
 
 ## GUI tutorial
 
-When one opens the gui, one can see two fields, two buttons and a top bar with a few buttons. Here I will go through what everything does, so every user can learn to use the tool.
+When one opens the GUI, one can see two fields, two buttons and a top bar with a few buttons. Here I will go through what everything does, so every user can learn to use the tool.
 
 ### Mod list:
 The list on the left. Lists the modpacks curretly installed in the modpacks folder.
