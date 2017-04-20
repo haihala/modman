@@ -41,7 +41,7 @@ There should only be one mod per line and the mod names are case specific.
 
 When one opens the GUI, one can see two fields, two buttons and a top bar with a few more buttons. More pictures coming later.
 
-![Image of GUI](https://imgur.com/a/ukIne)
+![Image of GUI](http://i.imgur.com/SjUg1P2.png)
 
 ### Mod list:
 The list on the left. Lists the modpacks curretly installed in the modpacks folder.
