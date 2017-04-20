@@ -8,7 +8,8 @@ ACTIONS = [
     "edit <packname>",
     "compress <packname>",
     "decompress <base64>",
-    "install <packname>"
+    "install <packname>",
+    "search <query>"
 ]
 
 HELP = {
@@ -17,7 +18,8 @@ HELP = {
     "edit": "Opens the specified pack in default text editor",
     "compress": "Makes a base64 digest of the mentioned modpack",
     "decompress": "Unpacks a mod from base64 digest (overrides existing modpacks with the same name)",
-    "install": "Despite what is in the mod folder, downloads the newest mods into the specified folder"
+    "install": "Despite what is in the mod folder, downloads the newest mods into the specified folder",
+    "search": "Search for mods"
 }
 
 def get_action_names():
@@ -89,6 +91,12 @@ def cmd_install(args):
     else:
         print("Invalid argument count")
         exit(1)
+
+def cmd_search(args):
+    results = modman.mod_portal.search(" ".join(args))
+
+    for i,s in enumerate(results):
+        print("{}. {}: {} ({} downloads)".format(i+1, s.name, s.title, s.downloads))
 
 def run(cmd):
     if cmd == []:

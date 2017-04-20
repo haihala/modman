@@ -53,3 +53,24 @@ class Mod(object):
         url = urljoin(FACTORIO_BASEURL, self.release["download_url"])
         assert ".." not in url # too paranoid? never.
         download_file(url, os.path.join(mod_folder, url.rsplit("/", 1)[1]))
+
+class SearchResult(object):
+    def __init__(self, data):
+        self.name = data["name"]
+        self.title = data["title"]
+        self.downloads = data["downloads_count"]
+        self.download_url = data["latest_release"]["download_url"]
+
+def search(query, order="updated", n=5):
+    assert n > 0 and n <= 25
+
+    # https://mods.factorio.com/api/mods?q=farl&tags=&order=updated&page_size=25&page=1
+    r = requests.get(urljoin(FACTORIO_BASEURL, "/api/mods"), {
+        "q": query,
+        "order": order,
+        "page": 1,
+        "page_size": n
+    })
+
+
+    return [SearchResult(result) for result in r.json()["results"]]
