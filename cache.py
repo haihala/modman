@@ -34,7 +34,13 @@ class Cache(object):
     def cache(self, filename, update=True):
         """Stores wanted mods to the cache. Deletes old versions, only holds the newest one."""
         assert filename.endswith(".zip")
-        shutil.move(os.path.join(self.mod_folder, filename), self.cache_folder)
+
+        if os.path.exists(os.path.join(self.cache_folder, filename)):
+            os.remove(os.path.join(self.mod_folder, filename))
+        else:
+            shutil.move(os.path.join(self.mod_folder, filename), self.cache_folder)
+
+
         if update:
             self.update()
 
