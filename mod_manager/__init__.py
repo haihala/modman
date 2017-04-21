@@ -49,7 +49,7 @@ class ModManager(object):
                 # TODO: do something about this!
                 pass
 
-    def install_matching(server):
+    def install_matching(self, server):
         """Autodetect packages on a server, and install matching mods locally."""
         # retrieve mod list here, so we can crash before altering cache if needed
         mods = autodetect.detect_server_packages(server)
