@@ -5,6 +5,7 @@ EvoGUI
 FARL
 autofill
 rso-mod
+research-queue
 Bottleneck
 RailTanker
 long-reach
