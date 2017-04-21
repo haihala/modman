@@ -46,7 +46,8 @@ def open_editor(filename):
 class CLI(object):
     ACTIONS = [
         "help [action]",
-        "list [package]",
+        "list",
+        "contents <packname> [packname2]...",
         "edit <packname>",
         "compress <packname>",
         "decompress <base64>",
@@ -58,7 +59,8 @@ class CLI(object):
 
     HELP = {
         "help": "If action is present, prints detailed information of the action, otherwise this help message is printed",
-        "list": "Lists all installed packages",
+        "list": "Lists all available modpacks",
+        "contents": "Lists all mods in a modpack",
         "edit": "Opens the specified pack in default text editor",
         "compress": "Makes a base64 digest of the mentioned modpack",
         "decompress": "Unpacks a mod from base64 digest (overrides existing modpacks with the same name)",
@@ -90,23 +92,31 @@ class CLI(object):
             exit(1)
 
     def cmd_list(self, args):
-        if args == []:
-            for p in self.mod_manager.modpacks:
-                print(p.name)
-        else:
-            packs = {p.name: p for p in self.mod_manager.modpacks}
-            for arg in args:
-                if arg in packs:
-                    pack = packs[arg]
-                    print(pack.name)
-                    if pack.contents == []:
-                        print("  (no mods)")
-                    else:
-                        for mod in pack.contents:
-                            print(" "*2 + mod)
+        if len(args) != 0:
+            print("Invalid argument count")
+            exit(1)
+
+        for p in self.mod_manager.modpacks:
+            print(p.name)
+
+    def cmd_contents(self, args):
+        if len(args) == 0:
+            print("Invalid argument count")
+            exit(1)
+
+        packs = {p.name: p for p in self.mod_manager.modpacks}
+        for arg in args:
+            if arg in packs:
+                pack = packs[arg]
+                print(pack.name)
+                if pack.contents == []:
+                    print("  (no mods)")
                 else:
-                    print("Mod pack \"{}\" does not exist.".format(pack.name))
-                    exit(1)
+                    for mod in pack.contents:
+                        print(" "*2 + mod)
+            else:
+                print("Mod pack \"{}\" does not exist.".format(pack.name))
+                exit(1)
 
     def cmd_edit(self, args):
         if len(args) != 1:
