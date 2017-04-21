@@ -1,6 +1,8 @@
 import sys
 import os.path
 
+from .cache_utils import cache_result
+
 def default_folder():
     if sys.platform.startswith("win32"):
         return os.path.expanduser(r"~\AppData\Roaming\Factorio\mods")
@@ -25,6 +27,7 @@ def is_factorio_main_folder(path):
     contents = os.listdir(path)
     return sum([fnanme in contents for fnanme in PROBABLY_CONTAINS]) >= len(PROBABLY_CONTAINS)/2
 
+@cache_result
 def get():
     config_exists = os.path.isfile("modman.conf")
 
