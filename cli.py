@@ -219,7 +219,7 @@ class CLI(object):
 
             fn(cmd[1:])
         else:
-            print("Invalid action \"{}\"").format(cmd[0])
+            print("Invalid action \"{}\"".format(cmd[0]))
             exit(1)
 
 
