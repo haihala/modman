@@ -1,4 +1,6 @@
+import os
 import sys
+import subprocess
 
 import modman
 
@@ -26,6 +28,43 @@ HELP = {
 
 def get_action_names():
     return [a.split()[0] for a in ACTIONS]
+
+
+def open_gui_editor(filename):
+    """Opens default GUI text editor."""
+    if sys.platform == "win32":
+        os.startfile(filename)
+    elif sys.platform.startswith("darwin"):
+        try:
+            subprocess.call(["open", filename])
+        except FileNotFoundError:
+            print("Your default editor \"{}\" could not be opened.")
+            print("You can manually open \"{}\" if you want to edit it.".format(filename))
+    elif sys.platform.startswith("linux"):
+        try:
+            subprocess.call(["xdg-open", filename])
+        except FileNotFoundError:
+            print("Your default editor \"{}\" could not be opened.")
+            print("You can manually open \"{}\" if you want to edit it.".format(filename))
+    else:
+        print("Could not determine text editor.")
+        print("You can manually open \"{}\" if you want to edit it.".format(filename))
+
+def open_editor(filename):
+    """Opens default text editor, preferring CLI editors to GUI editors."""
+    if sys.platform.startswith("win32"):
+        open_gui_editor(filename)
+    elif sys.platform.startswith("darwin") or sys.platform.startswith("linux"):
+        default_editor = os.environ.get("EDITOR", None)
+        if default_editor:
+            try:
+                subprocess.call([default_editor, filename])
+            except FileNotFoundError:
+                # could not use default editor
+                print("Your default editor \"{}\" could not be opened.")
+                print("You can manually open \"{}\" if you want to edit it.".format(filename))
+        else:
+            open_gui_editor(filename)
 
 def cmd_help(args):
     if args == []:
@@ -60,6 +99,14 @@ def cmd_list(args):
             else:
                 print("Mod pack \"{}\" does not exist.".format(pack.name))
                 exit(1)
+
+def cmd_edit(args):
+    if len(args) != 1:
+        print("Invalid argument count")
+        exit(1)
+
+    mp = modman.ModPack(args[0])
+    open_editor(mp.path)
 
 def cmd_compress(args):
     if len(args) != 1:
