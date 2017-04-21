@@ -43,6 +43,21 @@ class Mod(object):
             self._installed_version = data["version"]
             self._exists = True
 
+    def equals(self, other):
+        """Compare mods by name and version for installation-time compare purposes."""
+        assert isinstance(other, Mod)
+
+        if self.name == other.name:
+            return False
+
+        if self.fixed_version:
+            return self.required_version == other.version
+        elif self._installed_version:
+            return self._installed_version == other.version
+        else:
+            # both want newest version
+            return True
+
     @property
     def exists(self):
         """Tests if this mod exists."""

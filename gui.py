@@ -127,7 +127,7 @@ class App(QMainWindow, Ui_MainWindow):
             error("No pack selected")
             return
 
-        self.mod_manager.install_pack(pack)
+        self.mod_manager.install_packs([pack])
 
         # TODO: show progress steps
         # TODO: show message

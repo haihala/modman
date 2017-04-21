@@ -61,6 +61,8 @@ class CLI(object):
         "install <packname>",
         "match <server_address>",
         "enabled",
+        "enable <modname> [version]",
+        "disable <modname>",
         "search <query>",
         "credentials <action> [args]",
         "cache <action>"
@@ -76,6 +78,8 @@ class CLI(object):
         "install": "Despite what is in the mod folder, downloads the newest mods into the specified folder",
         "match": "Match your mod configuration to one in a server, using exactly same versions",
         "enabled": "List enabled mods",
+        "enable": "Enables a single mod by name and optionally a version number",
+        "disable": "Disable a single mod",
         "search": "Search for mods from the Factorio mod portal",
         "credentials": "Manage mod portal credentials. Actions: set, set [username] [password], clear",
         "cache": "Manage cache. Actions: clear, list"
@@ -169,16 +173,17 @@ class CLI(object):
 
     def cmd_install(self, args):
         if args:
+            packs = []
             for p in args:
                 mp = self.mod_manager.get_pack(p)
                 if mp.exists:
-                    print("Installing modpack: "+mp.name)
-                    for msg in self.mod_manager.install_pack(mp):
-                        print(msg, end="")
-                        sys.stdout.flush()
+                    packs.append(mp)
                 else:
                     print("Mod pack \"{}\" does not exist.".format(p))
                     exit(1)
+            for msg in self.mod_manager.install_packs(packs):
+                print("done\n" if msg is None else "Installing {}... ".format(msg.name), end="")
+                sys.stdout.flush()
         else:
             print("Invalid argument count")
             exit(1)
@@ -190,7 +195,7 @@ class CLI(object):
 
         try:
             for msg in self.mod_manager.install_matching(args[0]):
-                print(msg, end="")
+                print("done\n" if msg is None else "Installing {}... ".format(msg.name), end="")
                 sys.stdout.flush()
         except ConnectionRefusedError:
             print("Could not connect to the server. Is it running?")
