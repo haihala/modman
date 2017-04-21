@@ -38,9 +38,18 @@ For graphical application, double click `gui.py` file. If you are using GUI, you
 
 ### Command line tool
 
-Run `./cli.py credentials set` to save your factorio portal login information. After that, run `./cli.py help` to see a list of available commands.
+#### Login credentials
+Run `./cli.py credentials set` to save your factorio portal login information.
 
 
+#### Text editor
+
+On Unix-like systems, including Linux and macOS, the command line text editor can be set by using `EDITOR` environment variable. Most likely you want to set this in your `~/.bashrc` with `export EDITOR=vim` (you can of course use other editors than vim, e.g. nano).
+
+
+#### Usage
+
+ Running `./cli.py help` will display a list of available commands.
 
 ## Modpack format
 
