@@ -38,7 +38,7 @@ class Cache(object):
             os.remove(os.path.join(self.cache_folder, filename))
 
     def cache(self, filename, update=True):
-        """Stores wanted mods to the cache. Deletes old versions, only holds the newest one."""
+        """Stores wanted mod to the cache. Deletes old versions, only holds the newest one."""
         assert filename.endswith(".zip")
 
         if os.path.exists(os.path.join(self.cache_folder, filename)):
@@ -55,7 +55,7 @@ class Cache(object):
                 self.cache(filename, update=False)
         self.update()
 
-    def version(self, mod):
+    def contains(self, mod):
         """Checks if a mod with correct version exists in the cache."""
         self.update()
 
