@@ -31,6 +31,12 @@ class Cache(object):
                 return fname, parse_version(mod_version)
         return None
 
+    def clear(self):
+        """Clears all files from cache."""
+        for filename in os.listdir(self.cache_folder):
+            assert filename.endswith(".zip"), "Cache folder is supposed to contain only zip files"
+            os.remove(os.path.join(self.cache_folder, filename))
+
     def cache(self, filename, update=True):
         """Stores wanted mods to the cache. Deletes old versions, only holds the newest one."""
         assert filename.endswith(".zip")
@@ -39,7 +45,6 @@ class Cache(object):
             os.remove(os.path.join(self.mod_folder, filename))
         else:
             shutil.move(os.path.join(self.mod_folder, filename), self.cache_folder)
-
 
         if update:
             self.update()

@@ -52,7 +52,8 @@ class CLI(object):
         "decompress <base64>",
         "install <packname>",
         "match <server_address>",
-        "search <query>"
+        "search <query>",
+        "cache <action>"
     ]
 
     HELP = {
@@ -63,7 +64,8 @@ class CLI(object):
         "decompress": "Unpacks a mod from base64 digest (overrides existing modpacks with the same name)",
         "install": "Despite what is in the mod folder, downloads the newest mods into the specified folder",
         "match": "Match your mod configuration to one in a server, using exactly same versions",
-        "search": "Search for mods from the Factorio mod portal"
+        "search": "Search for mods from the Factorio mod portal",
+        "cache": "Manage cache. Actions: clear, list"
     }
 
     ACTION_NAMES = [a.split()[0] for a in ACTIONS]
@@ -81,9 +83,10 @@ class CLI(object):
                 print("  "+action+" "*(maxlen-len(action)+2)+self.HELP[action.split()[0]])
             print("")
         elif args[0] in self.ACTION_NAMES:
-            print(args[0]+":  "+self.HELP[args[0].split()[0]])
+            action = [a for a in self.ACTIONS if a.startswith(args[0])][0]
+            print(action+":  "+self.HELP[args[0]])
         else:
-            print("Invalid action \"{}\"").format(action)
+            print("Invalid action \"{}\"".format(args[0]))
             exit(1)
 
     def cmd_list(self, args):
@@ -170,6 +173,27 @@ class CLI(object):
 
         for i,s in enumerate(results):
             print("{}. {}: {} ({} downloads)".format(i+1, s.name, s.title, s.downloads))
+
+    def cmd_cache(self, args):
+        if len(args) != 1:
+            print("Invalid argument count")
+            exit(1)
+
+        if args[0] == "clear":
+            mod_manager.cache.Cache(mod_manager.factorio_folder.get()).clear()
+        elif args[0] == "list":
+            mods = [fname.rsplit(".", 1)[0].rsplit("_", 1) for fname in  mod_manager.cache.Cache(mod_manager.factorio_folder.get()).files]
+            if mods:
+                maxlen = max([len(x[0]) for x in mods])
+                for name, version in mods:
+                    print(name + " "*((maxlen-len(name))+2) + version)
+            else:
+                print("(no cached mods)")
+        else:
+            print("Invalid arguments")
+            print("Usage: cache <action>")
+            print("Actions: clear, list")
+            exit(1)
 
     def run(self, cmd):
         if cmd == []:

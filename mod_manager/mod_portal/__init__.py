@@ -18,7 +18,8 @@ class ModPortal(object):
         self._download_file(mod.url, os.path.join(mod_folder, mod.url.rsplit("/", 1)[1]))
 
     def _download_file(self, url, path):
-        r = requests.get(url, stream=True, headers={"User-Agent": "factorio"})
+        # r = requests.get(url, stream=True, headers={"User-Agent": "factorio"})
+        r = requests.get(url, stream=True)
         if r.headers["Content-Type"].strip().startswith("text/html"):
             # login required
             exit("LOGIN REQUIRED")
