@@ -72,7 +72,7 @@ class Folder(object, metaclass=_MetaFolder):
     def _file_action(cls, action, filename, target):
         assert isinstance(filename, str)
 
-        if isinstance(target, Folder):
+        if isinstance(target, _MetaFolder):
             target = target.path
 
         assert isinstance(target, str)

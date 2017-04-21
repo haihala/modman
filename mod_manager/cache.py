@@ -19,7 +19,7 @@ class Cache(object):
         for fname in self.files:
             mod_name, mod_version = fname.rsplit(".", 1)[0].rsplit("_", 1)
             if mod_name == name:
-                return fname, parse_version(mod_version)
+                return fname, mod_version
         return None
 
     def clear(self):
@@ -89,11 +89,11 @@ class Cache(object):
             mod_name, mod_version = fname.rsplit(".", 1)[0].rsplit("_", 1)
             if mod_name not in mods:
                 mods[mod_name] = []
-            mods[mod_name].append((fname, parse_version(mod_version)))
+            mods[mod_name].append((fname, mod_version))
 
         for mod_name in mods:
             # sorts in place from newest to oldest
-            mods[mod_name].sort(key=lambda m: m[1], reverse=True)
+            mods[mod_name].sort(key=lambda m: parse_version(m[1]), reverse=True)
 
             for fname, version in mods[mod_name][1:]:
                 os.remove(cache_folder.file_path(fname))
