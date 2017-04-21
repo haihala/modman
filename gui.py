@@ -7,9 +7,7 @@ from PyQt5 import QtCore, uic
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-import modman
-import cache
-import factorio_folder
+import mod_manager
 
 Ui_MainWindow, QtBaseClass = uic.loadUiType("gui.ui")
 
@@ -25,7 +23,8 @@ class App(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
 
         # Mod stuff
-        self.cache = cache.Cache(factorio_folder.get())
+        self.mod_manager = mod_manager.ModManager()
+        self.cache = mod_manager.cache.Cache(mod_manager.factorio_folder.get())
 
         # UI elements
         # Buttons
@@ -57,12 +56,12 @@ class App(QMainWindow, Ui_MainWindow):
 
     # Actions
     def save(self):
-        if not self.selected_pack:
+        if not self.get_selected_pack():
             self.save_as()
 
         # Get current editor text and transfer it into the currently selected pack file.
-        self.selected_pack.edit(self.mod_text_edit.toPlainText().replace("\r\n", "\n").split("\n"))
-        self.selected_pack.save()
+        self.get_selected_pack().edit(self.mod_text_edit.toPlainText().replace("\r\n", "\n").split("\n"))
+        self.get_selected_pack().save()
 
     def save_as(self):
         # Get current editor text and open a dialog to name the new modpack that has the following mods.
@@ -71,11 +70,15 @@ class App(QMainWindow, Ui_MainWindow):
 
     def load_mod(self):
         """Fill editor with currently selected modpack."""
-        self.mod_text_edit.setPlainText("\n".join(self.selected_pack.lines))
+        pack = self.get_selected_pack()
+        if pack is None:
+            # No pack selected
+            return
+        self.mod_text_edit.setPlainText("\n".join(pack.lines))
 
     def mods(self):
         """Open mods folder."""
-        self.open_folder(factorio_folder.get())
+        self.open_folder(mod_manager.factorio_folder.get())
 
     def modpacks(self):
         # open modpacks folder
@@ -87,7 +90,7 @@ class App(QMainWindow, Ui_MainWindow):
 
     def load_packs(self):
         self.mod_list.clear()
-        for pack in modman.modpacks():
+        for pack in self.mod_manager.modpacks:
             tmp = QListWidgetItem()
             tmp.setText(pack.name)
             self.mod_list.addItem(tmp)
@@ -96,7 +99,7 @@ class App(QMainWindow, Ui_MainWindow):
     def add_pack(self):
         name = self.get_string_popup("Pack name")
         if name:
-            modman.ModPack(name).save()
+            self.mod_manager.get_pack(name).save()
 
             tmp = QListWidgetItem()
             tmp.setText(name)
@@ -108,29 +111,33 @@ class App(QMainWindow, Ui_MainWindow):
     def add_string_pack(self):
         name = self.get_string_popup("Digest")
         if name:
-            modman.ModPack.decompress(args[0]).save()
+            mod_manager.modpack.ModPack.decompress(args[0]).save()
         self.load_packs()
 
     def install_pack(self):
-        if not self.selected_pack:
+        pack = self.get_selected_pack()
+        if pack is None:
             error("No pack selected")
             return
 
-        self.selected_pack.install()
+        self.mod_manager.install_pack(pack)
 
         # TODO: show progress steps
         # TODO: show message
 
     def pack_string(self):
-        if not self.selected_pack:
+        if self.get_selected_pack() is None:
             error("No pack selected")
             return
-        self.mod_text_edit.setPlainText("# Digest string of " + self.selected_pack + "\n\n" + self.selected_pack.compress())
+        print(self.get_selected_pack())
+        self.mod_text_edit.setPlainText("# Digest string of " + self.get_selected_pack() + "\n\n" + self.get_selected_pack().compress())
         self.mod_list.clearSelection()
 
-    @property
-    def selected_pack(self):
-        return modman.ModPack(self.mod_list.currentItem().data(0))
+    def get_selected_pack(self):
+        current_item = self.mod_list.currentItem()
+        if current_item is None:
+            return None
+        return self.mod_manager.get_pack(current_item.data(0))
 
     # Helpers
     def open_folder(self, path):

@@ -1,5 +1,5 @@
-from urllib.parse import urljoin
 import os.path
+from urllib.parse import urljoin
 
 try:
     import requests
@@ -8,21 +8,7 @@ except ImportError:
     print("Try this: pip3 install requests")
     exit(1)
 
-
-FACTORIO_BASEURL = "https://mods.factorio.com/"
-
-def download_file(url, path):
-    r = requests.get(url, stream=True, headers={"User-Agent": "factorio"})
-    if r.headers["Content-Type"].strip().startswith("text/html"):
-        # login required
-        exit("LOGIN REQUIRED")
-        return False
-    else:
-        with open(path, 'wb') as f:
-            for chunk in r.iter_content(chunk_size=1024):
-                if chunk: # filter out keep-alive new chunks
-                    f.write(chunk)
-        return True
+from . import config
 
 class Mod(object):
     def __init__(self, name, version=None):
@@ -35,7 +21,7 @@ class Mod(object):
     def url(self):
         if self.pseudo:
             raise RuntimeError("Pseudo mods do not have urls")
-        return urljoin(FACTORIO_BASEURL, "/api/mods/"+self.name)
+        return urljoin(config.FACTORIO_BASEURL, "/api/mods/"+self.name)
 
     @property
     def info(self):
@@ -74,32 +60,11 @@ class Mod(object):
                     return release
             raise ValueError("Not found")
 
-    def download_to(self, mod_folder):
+    @property
+    def download_url(self):
         if self.pseudo:
-            return
-
-        assert self.exists
-        url = urljoin(FACTORIO_BASEURL, self.release["download_url"])
-        assert ".." not in url # too paranoid? never.
-        download_file(url, os.path.join(mod_folder, url.rsplit("/", 1)[1]))
-
-class SearchResult(object):
-    def __init__(self, data):
-        self.name = data["name"]
-        self.title = data["title"]
-        self.downloads = data["downloads_count"]
-        self.download_url = data["latest_release"]["download_url"]
-
-def search(query, order="updated", n=5):
-    assert n > 0 and n <= 25
-
-    # https://mods.factorio.com/api/mods?q=farl&tags=&order=updated&page_size=25&page=1
-    r = requests.get(urljoin(FACTORIO_BASEURL, "/api/mods"), {
-        "q": query,
-        "order": order,
-        "page": 1,
-        "page_size": n
-    })
-
-
-    return [SearchResult(result) for result in r.json()["results"]]
+            return None
+        else:
+            assert self.exists
+            assert ".." not in self.release["download_url"] # too paranoid? never.
+            return urljoin(config.FACTORIO_BASEURL, self.release["download_url"])
