@@ -15,7 +15,6 @@ class ModPortal(object):
             self.credentials = c
         else:
             self.credentials = Credentials()
-            self.credentials.prompt()
         self.session = requests.Session()
 
     def login(self, failed_request):

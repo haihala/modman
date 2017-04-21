@@ -233,7 +233,6 @@ class CLI(object):
                 exit(1)
 
             mod_manager.credentials.Keyring.clear()
-            return
 
         elif args[0] == "set":
             if len(args) == 1:
@@ -250,7 +249,6 @@ class CLI(object):
                     exit(1)
 
             mod_manager.credentials.Keyring.set_credentials(c)
-            return
         else:
             print("Invalid action \"{}\"".format(args[0]))
             exit(1)
