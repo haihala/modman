@@ -2,6 +2,7 @@ import base64
 
 from .cache import *
 from . import factorio_folder
+from .mod import Mod
 
 MODPACK_TEMPLATE = "# Comments are allowed\n# Mods are listed in any order by name in mods.factorio.com url\n\n"
 
@@ -38,7 +39,13 @@ class ModPack(object):
     @property
     def contents(self):
         """List of modpack names."""
-        return list(set([i.strip() for i in self.lines if i != "" and i[0] != "#"]))
+        names = set([i.strip() for i in self.lines if i != "" and i[0] != "#"])
+        return [Mod(name) for name in names]
+
+    @property
+    def empty(self):
+        """Checks if this modpack doesn't contain any mods."""
+        return self.contents == []
 
     @property
     def path(self):
@@ -53,7 +60,7 @@ class ModPack(object):
             self._lines = MODPACK_TEMPLATE.split("\n")
 
     def edit(self, lines):
-        """Changes lines of this modpack. NOTE: Does not save to disk.""""
+        """Changes lines of this modpack. NOTE: Does not save to disk."""
         self._lines = lines
 
     def save(self):
