@@ -36,7 +36,7 @@ class ModPack(object):
     @property
     def contents(self):
         """List of modpack names."""
-        return [i.strip() for i in self.lines if i != "" and i[0] != "#"]
+        return list(set([i.strip() for i in self.lines if i != "" and i[0] != "#"]))
 
     @property
     def path(self):
