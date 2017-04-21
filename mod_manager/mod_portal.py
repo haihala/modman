@@ -63,10 +63,18 @@ class ModPortal(object):
         r = self.session.get(url, stream=True)
         if r.headers["Content-Type"].strip().startswith("text/html"):
             r = self.login(r)
-        with open(path, 'wb') as f:
-            for chunk in r.iter_content(chunk_size=1024):
-                if chunk: # filter out keep-alive new chunks
-                    f.write(chunk)
+
+        try:
+            with open(path, 'wb') as f:
+                for chunk in r.iter_content(chunk_size=1024):
+                    if chunk: # filter out keep-alive new chunks
+                        f.write(chunk)
+        except:
+            # the file is now closed, but we must clear the mod file too; it contains a broken zip file
+            print("\nDownload cancelled, removing file...")
+            os.remove(path)
+            print("removed")
+            raise
 
     def search(self, query, order="updated", n=5):
         assert n > 0 and n <= 25
