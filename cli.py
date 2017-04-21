@@ -202,6 +202,7 @@ class CLI(object):
             exit(1)
 
         if self.mod_manager.installed_mods:
+            maxlen = max([len(mod.name) for mod in self.mod_manager.installed_mods])
             for mod in self.mod_manager.installed_mods:
                 print(" "*2 + mod.name + " "*((maxlen-len(mod.name))+2) + mod.version)
         else:

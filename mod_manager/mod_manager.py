@@ -19,8 +19,12 @@ class ModManager(object):
 
     @property
     def installed_mods(self):
-        files = [fname.rsplit(".", 1) for fname in os.listdir(factorio_folder.get()) if fname.endswith(".zip")]
-        return [Mod(fname.rsplit("_", 1)) for fname in files]
+        mods = []
+        ff = factorio_folder.get()
+        for fname in os.listdir(ff):
+            if os.path.isfile(os.path.join(ff, fname)) and fname[0] != "." and not fname.endswith(".json"):
+                mods.append(Mod(fname))
+        return mods
 
     def install_pack(self, modpack):
         mod_folder = factorio_folder.get()
