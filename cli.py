@@ -63,7 +63,7 @@ class CLI(object):
         "enabled",
         "enable <modname> [version]",
         "disable <modname>",
-        "search <query> -n <integer>",
+        "search <query> [-n <integer>]",
         "credentials <action> [args]",
         "cache <action>"
     ]
