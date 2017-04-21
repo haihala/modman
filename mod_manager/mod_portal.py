@@ -1,9 +1,8 @@
-import os.path
 from urllib.parse import urljoin
 import re
 import requests
 
-from . import factorio_folder
+from .folders import mod_folder
 from .config import FACTORIO_BASEURL, FACTORIO_LOGINURL
 from .mod import Mod
 from .credentials import Keyring, Credentials
@@ -56,8 +55,7 @@ class ModPortal(object):
             return r
 
     def download(self, mod):
-        mod_folder = factorio_folder.get()
-        self._download_file(mod.download_url, os.path.join(mod_folder, mod.url.rsplit("/", 1)[1]))
+        self._download_file(mod.download_url, mod_folder.file_path(mod.url.rsplit("/", 1)[1]))
 
     def _download_file(self, url, path):
         r = self.session.get(url, stream=True)

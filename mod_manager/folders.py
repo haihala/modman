@@ -1,9 +1,9 @@
+import os
 import sys
-import os.path
-
-from .cache_utils import cache_result
+import shutil
 
 def default_folder():
+    """Returns default factorio mod folder for the current OS."""
     if sys.platform.startswith("win32"):
         return os.path.expanduser(r"~\AppData\Roaming\Factorio\mods")
     elif sys.platform.startswith("darwin"):
@@ -27,8 +27,7 @@ def is_factorio_main_folder(path):
     contents = os.listdir(path)
     return sum([fnanme in contents for fnanme in PROBABLY_CONTAINS]) >= len(PROBABLY_CONTAINS)/2
 
-@cache_result
-def get():
+def get_factorio_folder():
     config_exists = os.path.isfile("modman.conf")
 
     factorio_folder = default_folder()
@@ -48,3 +47,57 @@ def get():
     else:
         print("Could not determine factorio folder")
         exit(1)
+
+def get_cache_folder():
+    cache_path = os.path.join(mod_folder.path, "cache")
+    if not os.path.isdir(cache_path):
+        os.makedirs(cache_path)
+
+    return os.path.join(mod_folder.path, "cache")
+
+
+class _MetaFolder(type):
+    @property
+    def files(cls):
+        """List of all files in this folder."""
+        return os.listdir(cls.path)
+
+class Folder(object, metaclass=_MetaFolder):
+    @classmethod
+    def file_path(cls, filename):
+        """Return full path for a file"""
+        return os.path.join(cls.path, filename)
+
+    @classmethod
+    def _file_action(cls, action, filename, target):
+        assert isinstance(filename, str)
+
+        if isinstance(target, Folder):
+            target = target.path
+
+        assert isinstance(target, str)
+
+        action(cls.file_path(filename), target)
+
+    @classmethod
+    def move_file(cls, *args):
+        """Move a file to another folder."""
+        cls._file_action(shutil.move, *args)
+
+    @classmethod
+    def copy_file(cls, *args):
+        """Copy a file to another folder."""
+        cls._file_action(shutil.copy, *args)
+
+class mod_folder(Folder):
+    """Factorio mod folder."""
+    path = get_factorio_folder()
+
+class cache_folder(Folder):
+    """Mod cache folder."""
+    path = get_cache_folder()
+
+class modpack_folder(Folder):
+    """Application modpack folder."""
+    # TODO: absolute path
+    path = "modpacks"

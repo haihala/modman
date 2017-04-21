@@ -1,8 +1,8 @@
 import base64
 
-from .cache import *
-from . import factorio_folder
 from .mod import Mod
+from .folders import modpack_folder
+from .cache import *
 
 MODPACK_TEMPLATE = "# Comments are allowed\n# Mods are listed in any order by name in mods.factorio.com url\n\n"
 
@@ -62,7 +62,7 @@ class ModPack(object):
     @property
     def path(self):
         """Path for the modpack file."""
-        return os.path.join("modpacks", self.name+".txt")
+        return modpack_folder.file_path(self.name+".txt")
 
     def _load(self):
         if self.exists:

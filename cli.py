@@ -127,7 +127,7 @@ class CLI(object):
                 if pack not in matching:
                     matching.append(pack)
             else:
-                print("Mod pack \"{}\" does not exist.".format(pack.name))
+                print("Mod pack \"{}\" does not exist.".format(arg))
                 exit(1)
 
             lengths = [len(mod.name) for pack in matching for mod in pack.contents]

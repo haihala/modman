@@ -1,15 +1,16 @@
-import os
+import os.path
 
-from . import factorio_folder, autodetect
+from . import autodetect
 from .modpack import ModPack
 from .mod_portal import ModPortal
 from .mod import Mod
+from .folders import mod_folder, modpack_folder
 from .cache import Cache
 
 class ModManager(object):
     def __init__(self):
         self.mod_portal = ModPortal()
-        self.cache = Cache(factorio_folder.get())
+        self.cache = Cache()
 
     def get_pack(self, pack_name):
         return ModPack(pack_name)
@@ -17,15 +18,14 @@ class ModManager(object):
     @property
     def modpacks(self):
         """A list of all available modpacks."""
-        return [ModPack.from_filename(fname) for fname in os.listdir("modpacks") if fname.endswith(".txt")]
+        return [ModPack.from_filename(fname) for fname in modpack_folder.files if fname.endswith(".txt")]
 
     @property
     def installed_mods(self):
         """A list of all installed mods."""
         mods = []
-        ff = factorio_folder.get()
-        for fname in os.listdir(ff):
-            if os.path.isfile(os.path.join(ff, fname)) and fname[0] != "." and not fname.endswith(".json"):
+        for fname in mod_folder.files:
+            if os.path.isfile(mod_folder.file_path(fname)) and fname[0] != "." and not fname.endswith(".json"):
                 mods.append(Mod(fname))
         return mods
 

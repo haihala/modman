@@ -5,7 +5,8 @@ import requests
 import json
 import zipfile
 
-from . import config, factorio_folder
+from . import config
+from .folders import mod_folder
 
 class Mod(object):
     """
@@ -42,7 +43,7 @@ class Mod(object):
         self._exists = None
 
         if not self.pseudo and self.any_version_installed:
-            with zipfile.ZipFile(os.path.join(factorio_folder.get(), self.name)) as zf:
+            with zipfile.ZipFile(mod_folder.file_path(self.name)) as zf:
                 info_json_candidates = [n for n in zf.namelist() if n.rsplit("/", 1)[1] == "info.json"]
                 assert info_json_candidates, "Not a mod file"
                 with zf.open(info_json_candidates[0]) as f:
@@ -83,9 +84,8 @@ class Mod(object):
             return True
 
         candidates = []
-        ff = factorio_folder.get()
-        for fname in os.listdir(ff):
-            if os.path.isfile(os.path.join(ff, fname)) and fname[0] != "." and not fname.endswith(".json"):
+        for fname in mod_folder.files:
+            if os.path.isfile(mod_folder.file_path(fname)) and fname[0] != "." and not fname.endswith(".json"):
                 candidates.append(fname)
 
         return self.name in candidates
@@ -132,7 +132,7 @@ class Mod(object):
     def path(self):
         assert not self.pseudo, "Pseudo mods do not have path"
         assert self.installed, "Only installed mods have path"
-        return os.path.join(factorio_folder.get(), self.name)
+        return mod_folder.file_path(self.name)
 
     @property
     def url(self):
