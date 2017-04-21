@@ -8,9 +8,10 @@ if sys.version_info[0] != 3:
 import os
 from mod_manager.cache import *
 
-from mod_manager.modpack import ModPack
-from mod_manager import mod_portal, factorio_folder, autodetect
-from mod_manager.mod_portal.mod import Mod
+from . import factorio_folder, autodetect
+from .modpack import ModPack
+from .mod_portal import ModPortal
+from .mod import Mod
 
 class ModManager(object):
     def __init__(self):

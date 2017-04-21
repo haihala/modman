@@ -1,7 +1,7 @@
 import base64
 
-from mod_manager.cache import *
-from mod_manager import factorio_folder
+from .cache import *
+from . import factorio_folder
 
 MODPACK_TEMPLATE = "# Comments are allowed\n# Mods are listed in any order by name in mods.factorio.com url\n\n"
 

@@ -1,13 +1,9 @@
 import os.path
+from urllib.parse import urljoin
+import requests
 
-try:
-    import requests
-except ImportError:
-    print("It looks like requests is not installed.")
-    print("Try this: pip3 install requests")
-    exit(1)
-
-from mod_manager import factorio_folder
+from . import factorio_folder
+from .mod import Mod
 
 class ModPortal(object):
     def __init__(self):
@@ -30,3 +26,16 @@ class ModPortal(object):
                     if chunk: # filter out keep-alive new chunks
                         f.write(chunk)
             return True
+
+    def search(query, order="updated", n=5):
+        assert n > 0 and n <= 25
+
+        # https://mods.factorio.com/api/mods?q=farl&tags=&order=updated&page_size=25&page=1
+        r = requests.get(urljoin(config.FACTORIO_BASEURL, "/api/mods"), {
+            "q": query,
+            "order": order,
+            "page": 1,
+            "page_size": n
+        })
+
+        return [Mod.from_search(result) for result in r.json()["results"]]
