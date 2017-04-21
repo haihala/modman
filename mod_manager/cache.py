@@ -1,6 +1,8 @@
 import shutil
 import os.path
 
+from .mod import Mod
+
 def parse_version(ver):
     assert ver.count(".") == 2
     return [int(x) for x in ver.split(".")]
@@ -37,22 +39,23 @@ class Cache(object):
             assert filename.endswith(".zip"), "Cache folder is supposed to contain only zip files"
             os.remove(os.path.join(self.cache_folder, filename))
 
-    def cache(self, filename, update=True):
+    def cache(self, mod, update=True):
         """Stores wanted mod to the cache. Deletes old versions, only holds the newest one."""
-        assert filename.endswith(".zip")
-
-        if os.path.exists(os.path.join(self.cache_folder, filename)):
-            os.remove(os.path.join(self.mod_folder, filename))
+        if os.path.exists(os.path.join(self.cache_folder, mod.name)):
+            os.remove(os.path.join(self.mod_folder, mod.name))
         else:
-            shutil.move(os.path.join(self.mod_folder, filename), self.cache_folder)
+            shutil.move(
+                os.path.join(self.mod_folder, mod.name),
+                os.path.join(self.cache_folder, "_".join([mod.name, mod.version])+".zip")
+            )
 
         if update:
             self.update()
 
     def cache_all(self):
-        for filename in os.listdir(self.mod_folder):
-            if filename.endswith(".zip"):
-                self.cache(filename, update=False)
+        for fname in os.listdir(self.mod_folder):
+            if os.path.isfile(os.path.join(self.mod_folder, fname)) and fname[0] != "." and not fname.endswith(".json"):
+                self.cache(Mod(fname), update=False)
         self.update()
 
     def contains(self, mod):
