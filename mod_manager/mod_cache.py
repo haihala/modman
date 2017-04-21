@@ -7,7 +7,7 @@ def parse_version(ver):
     assert ver.count(".") == 2
     return [int(x) for x in ver.split(".")]
 
-class Cache(object):
+class ModCache(object):
     """Cache is a folder in the modfolder. Cache is primarily used to store uninstalled mods in case user wants to re-install them."""
     @property
     def files(self):

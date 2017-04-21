@@ -5,12 +5,12 @@ from .modpack import ModPack
 from .mod_portal import ModPortal
 from .mod import Mod
 from .folders import mod_folder, modpack_folder
-from .cache import Cache
+from .mod_cache import ModCache
 
 class ModManager(object):
     def __init__(self):
         self.mod_portal = ModPortal()
-        self.cache = Cache()
+        self.cache = ModCache()
 
     def get_pack(self, pack_name):
         return ModPack(pack_name)
