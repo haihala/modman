@@ -74,7 +74,7 @@ class CLI(object):
     def cmd_help(self, args):
         if args == []:
             print("")
-            print("Usage: ./{} [action] [args]".format(sys.argv[0]))
+            print("Usage: {} [action] [args]".format(sys.argv[0]))
             print("")
             maxlen = max(map(len, self.ACTIONS))
             for action in self.ACTIONS:
