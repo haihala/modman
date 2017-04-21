@@ -74,4 +74,4 @@ If you want, you can freely reach me on reddit /u/hajhawa. I will gladly respond
 
 ### Tests
 You can run automated tests by `python3 -m pytest`.
-You need pytest for this. It can be installed by `python3 -m pip install pytest`.
+You need pytest for this. It can be installed by `pip3 install pytest`.
