@@ -25,11 +25,11 @@ class Cache(object):
     def files(self):
         return os.listdir(os.path.join(self.cache_folder))
 
-    def query(self, q):
-        """Returns filenamename and version of the first mod with name q in the cache folder."""
+    def query(self, name):
+        """Returns filenamename and version of the first mod with the given name in the cache folder."""
         for fname in self.files:
             mod_name, mod_version = fname.rsplit(".", 1)[0].rsplit("_", 1)
-            if mod_name == q:
+            if mod_name == name:
                 return fname, parse_version(mod_version)
         return None
 
@@ -39,12 +39,18 @@ class Cache(object):
             assert filename.endswith(".zip"), "Cache folder is supposed to contain only zip files"
             os.remove(os.path.join(self.cache_folder, filename))
 
-    def cache(self, mod, update=True):
-        """Stores wanted mod to the cache. Deletes old versions, only holds the newest one."""
+    def cache(self, mod, delete=True, update=True):
+        """
+            Stores wanted mod to the cache.
+            If delete is true, deletes the mod from the mod folder.
+            If delete is true, performs automatic cleaup on cached mods.
+        """
         if os.path.exists(os.path.join(self.cache_folder, mod.name)):
-            os.remove(os.path.join(self.mod_folder, mod.name))
+            if delete:
+                os.remove(os.path.join(self.mod_folder, mod.name))
         else:
-            shutil.move(
+            action = shutil.move if delete else shutil.copy
+            action(
                 os.path.join(self.mod_folder, mod.name),
                 os.path.join(self.cache_folder, "_".join([mod.name, mod.version])+".zip")
             )
@@ -52,11 +58,14 @@ class Cache(object):
         if update:
             self.update()
 
-    def cache_all(self):
+    def cache_all(self, delete=True, update=True):
+        """Caches all files in the mod folder."""
         for fname in os.listdir(self.mod_folder):
             if os.path.isfile(os.path.join(self.mod_folder, fname)) and fname[0] != "." and not fname.endswith(".json"):
-                self.cache(Mod(fname), update=False)
-        self.update()
+                self.cache(Mod(fname), delete=delete, update=False)
+
+        if update:
+            self.update()
 
     def contains(self, mod):
         """Checks if a mod with correct version exists in the cache."""

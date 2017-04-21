@@ -261,9 +261,9 @@ class CLI(object):
             exit(1)
 
         if args[0] == "clear":
-            mod_manager.cache.Cache(mod_manager.factorio_folder.get()).clear()
+            self.mod_manager.cache.clear()
         elif args[0] == "list":
-            mods = [fname.rsplit(".", 1)[0].rsplit("_", 1) for fname in  mod_manager.cache.Cache(mod_manager.factorio_folder.get()).files]
+            mods = [fname.rsplit(".", 1)[0].rsplit("_", 1) for fname in  self.mod_manager.cache.files]
             if mods:
                 maxlen = max([len(x[0]) for x in mods])
                 for name, version in mods:
