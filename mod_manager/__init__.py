@@ -27,8 +27,6 @@ class ModManager(object):
     @property
     def installed_mods(self):
         files = [fname.rsplit(".", 1) for fname in os.listdir(factorio_folder.get()) if fname.endswith(".zip")]
-        print(factorio_folder.get())
-        print(os.listdir(factorio_folder.get()))
         return [Mod(fname.rsplit("_", 1)) for fname in files]
 
     def install_pack(self, modpack):
