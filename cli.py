@@ -113,17 +113,26 @@ class CLI(object):
 
         packs = {p.name: p for p in self.mod_manager.modpacks}
         for arg in args:
+            matching = []
             if arg in packs:
                 pack = packs[arg]
-                print(pack.name)
-                if pack.contents == []:
-                    print("  (no mods)")
-                else:
-                    for mod in pack.contents:
-                        print(" "*2 + mod)
+                if pack not in matching:
+                    matching.append(pack)
             else:
                 print("Mod pack \"{}\" does not exist.".format(pack.name))
                 exit(1)
+
+            lengths = [len(mod.name) for pack in matching for mod in pack.contents]
+            if lengths:
+                maxlen = max(lengths)
+
+            for pack in matching:
+                print(pack.name)
+                if pack.empty:
+                    print("  (modpack is empty)")
+                else:
+                    for mod in pack.contents:
+                        print(" "*2 + mod.name + " "*((maxlen-len(mod.name))+2) + mod.version)
 
     def cmd_edit(self, args):
         if len(args) != 1:

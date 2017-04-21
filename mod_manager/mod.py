@@ -1,7 +1,9 @@
-import os.path
+import os
+import re
 from urllib.parse import urljoin
+import requests
 
-from . import config
+from . import config, factorio_folder
 
 class Mod(object):
     @classmethod
@@ -19,11 +21,47 @@ class Mod(object):
         self._info = None
 
     @property
+    def exists(self):
+        """Tests if this mod exists."""
+        if self.pseudo:
+            return True
+        return bool(self.info)
+
+    @property
     def installed(self):
         """Test if this mod is currently installed."""
         if self.pseudo:
             return True
-        return bool(self.info)
+
+        files = [fname.rsplit(".", 1) for fname in os.listdir(factorio_folder.get()) if fname.endswith(".zip")]
+        name_version_regex = re.compile(r"^" + re.escape(self.name) + r"_\d+\.\d+\.\d+$")
+        candidates = [fname.rsplit("_", 1) for fname in files if name_version_regex.match(self.name)]
+        if not candidates:
+            return False
+
+        print(candidates)
+        exit()
+
+    @property
+    def version(self):
+        """Return current version of this modpack."""
+        assert not self.pseudo, "Pseudo mods do not have version info"
+
+        if self.required_version is None:
+            return self.info["releases"][0]["version"] + " (floating)"
+        else:
+            return self.required_version + " (fixed)"
+
+    @property
+    def last_available_version(self):
+        """Return latest available of this modpack."""
+        assert not self.pseudo, "Pseudo mods do not have version info"
+        return self.info["releases"][0]["version"]
+
+    @property
+    def can_be_updated(self):
+        """Checks if this mod can be updated to a newer version."""
+        return self.version == self.last_available_version
 
     @property
     def url(self):
@@ -44,9 +82,6 @@ class Mod(object):
             assert parsed["detail"] == "Not found."
 
         self._info = data
-        print("#\n")
-        print(data)
-        print("\n\n#")
         return self._info
 
     @property

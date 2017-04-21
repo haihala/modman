@@ -34,9 +34,7 @@ class ModManager(object):
         cache.cache_all()
 
         # Install new mods
-        for modname in modpack.contents:
-            mod = Mod(modname)
-
+        for mod in modpack.contents:
             if mod.exists:
                 if cache.version(mod, mod.release):
                      # If mod is in cache, get it.

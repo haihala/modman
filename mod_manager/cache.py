@@ -55,17 +55,17 @@ class Cache(object):
                 self.cache(filename, update=False)
         self.update()
 
-    def version(self, mod, version):
-        """Checks if a mod with the given version exists in the cache."""
+    def version(self, mod):
+        """Checks if a mod with correct version exists in the cache."""
         self.update()
 
         q = self.query(mod.name)
         if q is None:
             return False  # No such mod found
 
-        filename, mod_version = q
+        filename, cached_mod_version = q
 
-        if mod_version == version:
+        if cached_mod_version == mod.version:
             return True
 
         # Newest cached version is old as well
