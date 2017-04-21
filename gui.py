@@ -15,6 +15,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 import mod_manager
+from mod_manager.folders import mod_folder
 
 Ui_MainWindow, QtBaseClass = uic.loadUiType("gui.ui")
 
@@ -31,7 +32,7 @@ class App(QMainWindow, Ui_MainWindow):
 
         # Mod stuff
         self.mod_manager = mod_manager.ModManager()
-        self.cache = mod_manager.cache.Cache(mod_manager.factorio_folder.get())
+        self.cache = mod_manager.cache.Cache()
 
         # UI elements
         # Buttons
@@ -85,7 +86,7 @@ class App(QMainWindow, Ui_MainWindow):
 
     def mods(self):
         """Open mods folder."""
-        self.open_folder(mod_manager.factorio_folder.get())
+        self.open_folder(mod_folder.path)
 
     def modpacks(self):
         # open modpacks folder

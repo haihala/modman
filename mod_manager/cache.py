@@ -1,6 +1,6 @@
-import shutil
 import os.path
 
+from .folders import mod_folder, cache_folder
 from .mod import Mod
 
 def parse_version(ver):
@@ -9,21 +9,10 @@ def parse_version(ver):
 
 class Cache(object):
     """Cache is a folder in the modfolder. Cache is primarily used to store uninstalled mods in case user wants to re-install them."""
-    def __init__(self, path):
-        self.mod_folder = path
-
-    @property
-    def cache_folder(self):
-        """Checks if cache folder exists. If it doesn't, creates one."""
-        cache_path = os.path.join(self.mod_folder, "cache")
-        if not os.path.isdir(cache_path):
-            os.makedirs(cache_path)
-
-        return os.path.join(self.mod_folder, "cache")
-
     @property
     def files(self):
-        return os.listdir(os.path.join(self.cache_folder))
+        """List of all files in the cache folder."""
+        return cache_folder.files
 
     def query(self, name):
         """Returns filenamename and version of the first mod with the given name in the cache folder."""
@@ -35,9 +24,9 @@ class Cache(object):
 
     def clear(self):
         """Clears all files from cache."""
-        for filename in os.listdir(self.cache_folder):
+        for filename in cache_folder.files:
             assert filename.endswith(".zip"), "Cache folder is supposed to contain only zip files"
-            os.remove(os.path.join(self.cache_folder, filename))
+            os.remove(cache_folder.file_path(filename))
 
     def cache(self, mod, delete=True, update=True):
         """
@@ -45,23 +34,21 @@ class Cache(object):
             If delete is true, deletes the mod from the mod folder.
             If delete is true, performs automatic cleaup on cached mods.
         """
-        if os.path.exists(os.path.join(self.cache_folder, mod.name)):
+        if os.path.exists(cache_folder.file_path(mod.name)):
             if delete:
-                os.remove(os.path.join(self.mod_folder, mod.name))
+                os.remove(mod_folder.file_path(mod.name))
         else:
-            action = shutil.move if delete else shutil.copy
-            action(
-                os.path.join(self.mod_folder, mod.name),
-                os.path.join(self.cache_folder, "_".join([mod.name, mod.version])+".zip")
-            )
+            target = cache_folder.file_path("_".join([mod.name, mod.version])+".zip")
+            action = mod_folder.move_file if delete else mod_folder.copy_file
+            action(mod.name, target)
 
         if update:
             self.update()
 
     def cache_all(self, delete=True, update=True):
         """Caches all files in the mod folder."""
-        for fname in os.listdir(self.mod_folder):
-            if os.path.isfile(os.path.join(self.mod_folder, fname)) and fname[0] != "." and not fname.endswith(".json"):
+        for fname in mod_folder.files:
+            if os.path.isfile(mod_folder.file_path(fname)) and fname[0] != "." and not fname.endswith(".json"):
                 self.cache(Mod(fname), delete=delete, update=False)
 
         if update:
@@ -81,7 +68,7 @@ class Cache(object):
             return True
 
         # Newest cached version is old as well
-        os.remove(os.path.join(self.cache_folder, filename))
+        os.remove(cache_folder.file_path(filename))
         return False
 
     def fetch(self, mod):
@@ -92,7 +79,7 @@ class Cache(object):
         if q is None:
             raise ValueError("Did not found the given mod")
 
-        shutil.copy(os.path.join(self.cache_folder, q[0]), self.mod_folder)
+        cache_folder.copy_file(q[0], mod_folder)
 
     def update(self):
         """Removes old versions of mods from the cache folder."""
@@ -109,4 +96,4 @@ class Cache(object):
             mods[mod_name].sort(key=lambda m: m[1], reverse=True)
 
             for fname, version in mods[mod_name][1:]:
-                os.remove(os.path.join(self.cache_folder, fname))
+                os.remove(cache_folder.file_path(fname))
