@@ -8,8 +8,15 @@ import zipfile
 from . import config, factorio_folder
 
 class Mod(object):
+    """
+        A single mod.
+        This class handles all different cases where you need to access mod information.
+        Network requests are only done when absolutely needed.
+    """
+
     @classmethod
     def from_name(cls, name):
+        """Creates a mod instance from a mod name and optionally a version."""
         # Match to name and optionally a version
         m = re.match(r"^([^ ]+)\s*(\d+\.\d+\.\d+)?$", name.strip())
         if not m:
@@ -18,6 +25,7 @@ class Mod(object):
 
     @classmethod
     def from_search(cls, data):
+        """Creates a mod instance from a search result."""
         self = cls(data["name"])
         self.title = data["title"]
         self.downloads_count = data["downloads_count"]
@@ -133,6 +141,7 @@ class Mod(object):
 
     @property
     def releases(self):
+        """List all releases of the mod."""
         assert not self.pseudo, "Pseudo mods do not have info"
 
         if not self._releases:
