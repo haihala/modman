@@ -21,14 +21,14 @@ class Mod(object):
         self = cls(data["name"])
         self._title = data["title"]
         self._downloads = data["downloads_count"]
-        self._info = {"releases": [data["latest_release"]]}
+        self._releases = [data["latest_release"]]
         return self
 
     def __init__(self, name, version=None):
         self.name = name
         self.pseudo = (name == "base")
         self.required_version = version # None means newest
-        self._info = None
+        self._releases = None
         self._installed_version = None
 
         if not self.pseudo and self.any_version_installed:
@@ -79,7 +79,7 @@ class Mod(object):
         elif self._installed_version:
             return self._installed_version
         else:
-            return self.info["releases"][0]["version"]
+            return self.releases[0]["version"]
 
     @property
     def fixed_version(self):
@@ -90,7 +90,7 @@ class Mod(object):
     def last_available_version(self):
         """Return latest available of this modpack."""
         assert not self.pseudo, "Pseudo mods do not have version info"
-        return self.info["releases"][0]["version"]
+        return self.releases[0]["version"]
 
     @property
     def can_be_updated(self):
@@ -111,10 +111,10 @@ class Mod(object):
         return urljoin(config.FACTORIO_BASEURL, "/api/mods/"+self.name)
 
     @property
-    def info(self):
+    def releases(self):
         assert not self.pseudo, "Pseudo mods do not have info"
 
-        if not self._info:
+        if not self._releases:
             r = requests.get(self.url)
 
             r.raise_for_status()
@@ -124,8 +124,8 @@ class Mod(object):
             if len(data) == 1:
                 assert parsed["detail"] == "Not found."
 
-            self._info = data
-        return self._info
+            self.releases = data["releases"]
+        return self._releases
 
     @property
     def release(self):
@@ -134,13 +134,13 @@ class Mod(object):
 
         if self.fixed_version:
             # search for the correct version
-            for release in self.info["releases"]:
+            for release in self.releases:
                 if release["version"] == self.required_version:
                     return release
             raise ValueError("Not found")
         else:
             # newest
-            return self.info["releases"][0]
+            return self.releases[0]
 
     @property
     def download_url(self):
