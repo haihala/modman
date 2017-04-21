@@ -25,10 +25,12 @@ class ModPack(object):
 
     @property
     def exists(self):
+        """Checks if the modpack is saved on disk."""
         return self.name+".txt" in os.listdir("modpacks")
 
     @property
     def lines(self):
+        """All lines in the modpack file."""
         if self._lines is None:
             self._load()
         return self._lines
@@ -40,6 +42,7 @@ class ModPack(object):
 
     @property
     def path(self):
+        """Path for the modpack file."""
         return os.path.join("modpacks", self.name+".txt")
 
     def _load(self):
@@ -50,20 +53,24 @@ class ModPack(object):
             self._lines = MODPACK_TEMPLATE.split("\n")
 
     def edit(self, lines):
+        """Changes lines of this modpack. NOTE: Does not save to disk.""""
         self._lines = lines
 
     def save(self):
+        """Saves contents of this modpack to disk."""
         # This must be before open call, so file gets created with template
         data = "\n".join(self.lines)
         with open(self.path, "w") as f:
             f.write(data)
 
     def compress(self):
+        """Compresses this modpack to a base64 string."""
         data = "\n".join([self.name] + self.lines)
         return base64.b64encode(data.encode()).decode()
 
     @classmethod
     def decompress(cls, data):
+        """Creates a new instance fron base64 string created by compress."""
         info = base64.b64decode(data.encode()).decode()
         name, contents = info.split("\n", 1)
         self = cls(name)
