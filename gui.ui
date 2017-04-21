@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>640</width>
+    <height>472</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Factorio mod manager</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="1" column="0">
+     <widget class="QPushButton" name="install_pack_button">
+      <property name="text">
+       <string>Install</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2" rowspan="2">
+     <widget class="QPlainTextEdit" name="mod_text_edit"/>
+    </item>
+    <item row="1" column="1">
+     <widget class="QPushButton" name="add_pack_button">
+      <property name="text">
+       <string>Add a pack</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0" colspan="2">
+     <widget class="QListWidget" name="mod_list"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>640</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <widget class="QMenu" name="menuOpen_folder">
+     <property name="title">
+      <string>Open folder</string>
+     </property>
+     <addaction name="open_mods_button"/>
+     <addaction name="open_modpacks_button"/>
+     <addaction name="open_cache_button"/>
+    </widget>
+    <addaction name="save_button"/>
+    <addaction name="save_as_button"/>
+    <addaction name="separator"/>
+    <addaction name="menuOpen_folder"/>
+    <addaction name="refresh_button"/>
+   </widget>
+   <widget class="QMenu" name="menuPacks">
+    <property name="title">
+     <string>Packs</string>
+    </property>
+    <widget class="QMenu" name="menuAdd">
+     <property name="title">
+      <string>Add pack</string>
+     </property>
+     <addaction name="add_empty_pack_button"/>
+     <addaction name="add_string_pack_button"/>
+    </widget>
+    <addaction name="menuAdd"/>
+    <addaction name="install_pack_button_2"/>
+    <addaction name="get_pack_string_button"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuPacks"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionOpen_modpack_folder">
+   <property name="text">
+    <string>Open modpack folder</string>
+   </property>
+  </action>
+  <action name="actionOpen_mod_folder">
+   <property name="text">
+    <string>Open mod folder</string>
+   </property>
+  </action>
+  <action name="open_mods_button">
+   <property name="text">
+    <string>mods</string>
+   </property>
+  </action>
+  <action name="open_modpacks_button">
+   <property name="text">
+    <string>modpacks</string>
+   </property>
+  </action>
+  <action name="open_cache_button">
+   <property name="text">
+    <string>cache</string>
+   </property>
+  </action>
+  <action name="refresh_button">
+   <property name="text">
+    <string>Refresh</string>
+   </property>
+  </action>
+  <action name="install_pack_button_2">
+   <property name="text">
+    <string>Install</string>
+   </property>
+  </action>
+  <action name="add_empty_pack_button">
+   <property name="text">
+    <string>Empty</string>
+   </property>
+  </action>
+  <action name="add_string_pack_button">
+   <property name="text">
+    <string>From string...</string>
+   </property>
+  </action>
+  <action name="get_pack_string_button">
+   <property name="text">
+    <string>get as string</string>
+   </property>
+  </action>
+  <action name="save_button">
+   <property name="text">
+    <string>save</string>
+   </property>
+  </action>
+  <action name="save_as_button">
+   <property name="text">
+    <string>save as...</string>
+   </property>
+  </action>
+  <action name="actionOn_modpacks">
+   <property name="text">
+    <string>On modpacks</string>
+   </property>
+  </action>
+  <action name="help_button">
+   <property name="text">
+    <string>Help</string>
+   </property>
+  </action>
+  <action name="preferences_button">
+   <property name="text">
+    <string>Preferences</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
