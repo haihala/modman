@@ -25,19 +25,21 @@ Install everything the program is dependent on. After installing dependencies, y
 
 ### Dependencies
 
-#### Both CLI and GUI
+#### Python 3
 
-* Python3
-    * Install from https://www.python.org/downloads/
-* Python3 requests
-    * After installing python3:
-        * Run `pip3 install requests` in terminal/cmd
+Install Python 3 from https://www.python.org/downloads/.
+After installing Python 3 run
 
-#### For the GUI
+```
+pip3 install requests keyring
+```
 
-* Python3 PyQt5
-    * After installing python3:
-        * Run `pip3 install PyQt5` in terminal/cmd
+in terminal or cmd.
+If you want to use the GUI too, you must also run
+
+```
+pip3 install PyQt5
+```
 
 ## Modpack format
 
@@ -97,6 +99,10 @@ Behavior is identical to the "Install" button below mod list.
 
 ##### Get as string
 Forms a hash of currently selected pack and changes the text in mod content box to show the user this hash.
+
+## Cli tutorial
+
+Run `./cli.py credentials set` to save your factorio portal login information. After that, run `./cli.py help` to see a list of available commands.
 
 ## Notes
 You can freely copy modpack files around, they are just lines of text with mod names.
