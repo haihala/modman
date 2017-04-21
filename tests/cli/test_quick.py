@@ -22,6 +22,8 @@ def test_crash():
     assert 0 == sp.call([CLI_FILE, "cache", "list"], stdout=sp.DEVNULL, stderr=sp.DEVNULL)
     assert 0 == sp.call([CLI_FILE, "cache", "clear"], stdout=sp.DEVNULL, stderr=sp.DEVNULL)
 
+    # We don't want to clear stored credentials so we can't test that yet
 
     # test that invalid commands crash
     assert 0 != sp.call([CLI_FILE, "<<INVALID_COMMAND>>"], stdout=sp.DEVNULL, stderr=sp.DEVNULL)
+    assert 0 != sp.call([CLI_FILE, "credentials", "set", "a", "b"], stdout=sp.DEVNULL, stderr=sp.DEVNULL)

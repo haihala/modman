@@ -6,12 +6,17 @@ import requests
 from . import factorio_folder
 from .config import FACTORIO_BASEURL, FACTORIO_LOGINURL
 from .mod import Mod
-from .credentials import Credentials
+from .credentials import Keyring, Credentials
 
 class ModPortal(object):
     """Handles factorio mod portal access. Logs in if required."""
     def __init__(self):
-        self.credentials = Credentials()
+        c = Keyring.get_credentials()
+        if c:
+            self.credentials = c
+        else:
+            self.credentials = Credentials()
+            self.credentials.prompt()
         self.session = requests.Session()
 
     def login(self, failed_request):
@@ -48,7 +53,6 @@ class ModPortal(object):
             print("Invalid username or password")
             exit(2)
         else:
-            print("Login successful")
             return r
 
     def download(self, mod):

@@ -62,6 +62,7 @@ class CLI(object):
         "match <server_address>",
         "enabled",
         "search <query>",
+        "credentials <action> [args]",
         "cache <action>"
     ]
 
@@ -76,6 +77,7 @@ class CLI(object):
         "match": "Match your mod configuration to one in a server, using exactly same versions",
         "enabled": "List enabled mods",
         "search": "Search for mods from the Factorio mod portal",
+        "credentials": "Manage mod portal credentials. Actions: set, set [username] [password], clear",
         "cache": "Manage cache. Actions: clear, list"
     }
 
@@ -214,6 +216,39 @@ class CLI(object):
 
         for i,s in enumerate(results):
             print("{}. {}: {} ({} downloads)".format(i+1, s.name, s.title, s.downloads_count))
+
+    def cmd_credentials(self, args):
+        if len(args) not in [1,3]:
+            print("Invalid argument count")
+            exit(1)
+
+        if args[0] == "clear":
+            if len(args) != 1:
+                print("Invalid arguments: clear doesn't take any")
+                exit(1)
+
+            mod_manager.credentials.Keyring.clear()
+            return
+
+        elif args[0] == "set":
+            if len(args) == 1:
+                c = mod_manager.credentials.Credentials()
+                c.prompt()
+            else:
+                c = mod_manager.credentials.Credentials(*args[1:])
+                if not c.ok:
+                    print("Invalid credentials: minimun lengths are:")
+                    print("{} for username and {} for password".format(
+                        mod_manager.credentials.Credentials.USERNAME_MIN,
+                        mod_manager.credentials.Credentials.PASSWORD_MIN
+                    ))
+                    exit(1)
+
+            mod_manager.credentials.Keyring.set_credentials(c)
+            return
+        else:
+            print("Invalid action \"{}\"".format(args[0]))
+            exit(1)
 
     def cmd_cache(self, args):
         if len(args) != 1:
