@@ -1,24 +1,33 @@
 # modman
-Factorio command line mod manager.
+Factorio mod manager.
 
 ## Usage:
-After installation, run eihter "gui.py" or "modman.py", where the latter is a text based user interface that will tell you what to do. Gui tutorial is below. Gui can be started by double clicking gui.py after python3 and requests have been installed.
+
+Before use, install dependencies. See Installation for more information.
+
+For graphical application, double click "gui.py" file. Help on how to use the tool can be found in this document.
+
+For command line tool, run "cli.py". This will print the help message, describing everything you can do.
 
 ## Installation:
 
+Install everything the program is dependent on. After installing dependencies, you should be able to run everything. Installer coming soon™.
+
 ### Dependencies:
+
+#### Both CLI and GUI:
+
 * Python3
     * Install from https://www.python.org/downloads/
 * Python3 requests
     * After installing python3:
-        * "pip3 install requests" in terminal/cmd
+        * run "pip3 install requests" in terminal/cmd
 
-#### For the GUI
+#### For the GUI:
+
 * Python3 PyQt5
     * After installing python3:
-        * "pip3 install PyQt5" in terminal/cmd
-
-After you downloaded the repository and installed the dependencies, you only need to specify your mod folder location. If you try to run the script, it will open the config file in your default editor. You need to replace "Change this!" with the location of your factorio mod folder. Once this is done, re-run the script and it will tell you how it works
+        * run "pip3 install PyQt5" in terminal/cmd
 
 ## Modpack format.
 
@@ -30,7 +39,9 @@ There should only be one mod per line and the mod names are case specific.
 
 ## GUI tutorial
 
-When one opens the GUI, one can see two fields, two buttons and a top bar with a few buttons. Here I will go through what everything does, so every user can learn to use the tool.
+When one opens the GUI, one can see two fields, two buttons and a top bar with a few more buttons. More pictures coming later.
+
+![Image of GUI](http://i.imgur.com/SjUg1P2.png)
 
 ### Mod list:
 The list on the left. Lists the modpacks curretly installed in the modpacks folder.
