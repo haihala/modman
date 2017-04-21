@@ -31,7 +31,7 @@ def detect_server_packages(addr):
         try:
             data = s.recv(512)
         except socket.timeout:
-            raise RuntimeError("Apparently data was invalid")
+            raise BrokenPipeError
         break
 
     assert data[0] == 0x03 # packet type (CONN_START_RESP)
@@ -71,7 +71,7 @@ def detect_server_packages(addr):
         try:
             d = s.recv(1024)
         except socket.timeout:
-            raise RuntimeError("Apparently data was invalid")
+            raise BrokenPipeError
         if data:
             assert d[0] == 0xc5 # packet type: CONN_JOIN
             # coninuation packages have 4
@@ -119,6 +119,8 @@ def detect_server_packages(addr):
 
     mods = []
     for _ in range(mod_arr_len-1):
+        if data[ptr] == 0xff: # alternate end-of-list marker
+            break
         mod_name = data[ptr+1:ptr+int(data[ptr])+1].decode()
         ptr = ptr + int(data[ptr]) + 1
         mod_version = ".".join([str(int(x)) for x in data[ptr:ptr+3]])

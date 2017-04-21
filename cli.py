@@ -174,7 +174,7 @@ class CLI(object):
         except ConnectionRefusedError:
             print("Could not connect to the server. Is it running?")
             exit(1)
-        except RuntimeError as e:
+        except BrokenPipeError:
             print("Could not communicate with the server. Are you using same Factorio version?")
             exit(1)
 
