@@ -63,7 +63,7 @@ class CLI(object):
         "enabled",
         "enable <modname> [version]",
         "disable <modname>",
-        "search <query>",
+        "search <query> -n <integer>",
         "credentials <action> [args]",
         "cache <action>"
     ]
@@ -80,7 +80,7 @@ class CLI(object):
         "enabled": "List enabled mods",
         "enable": "Enables a single mod by name and optionally a version number",
         "disable": "Disable a single mod",
-        "search": "Search for mods from the Factorio mod portal",
+        "search": "Search for mods from the Factorio mod portal. Specify the amount of results with -n parameter. By default 5 results are displayed.",
         "credentials": "Manage mod portal credentials. Actions: set, set [username] [password], clear",
         "cache": "Manage cache. Actions: clear, list"
     }
@@ -217,7 +217,20 @@ class CLI(object):
             print("(no mods installed)")
 
     def cmd_search(self, args):
-        results = self.mod_manager.mod_portal.search(" ".join(args))
+        search_args = " ".join(args)
+        wanted_responces = 5
+
+        lenght_param = search_args.rsplit(" -n ", 1)
+
+        if len(lenght_param) == 2 and len(lenght_param[1]):
+            try:
+                wanted_responces = int(lenght_param[1])
+                wanted_responces = min(max(wanted_responces, 0), 25)
+                search_args = " ".join(args[:-2])
+            except ValueError:
+                pass
+
+        results = self.mod_manager.mod_portal.search(search_args, n=wanted_responces)
 
         for i,s in enumerate(results):
             print("{}. {}: {} ({} downloads)".format(i+1, s.name, s.title, s.downloads_count))
