@@ -9,6 +9,7 @@ ACTIONS = [
     "compress <packname>",
     "decompress <base64>",
     "install <packname>",
+    "match <server_address>",
     "search <query>"
 ]
 
@@ -19,7 +20,8 @@ HELP = {
     "compress": "Makes a base64 digest of the mentioned modpack",
     "decompress": "Unpacks a mod from base64 digest (overrides existing modpacks with the same name)",
     "install": "Despite what is in the mod folder, downloads the newest mods into the specified folder",
-    "search": "Search for mods"
+    "match": "Match your mod configuration to one in a server, using exactly same versions",
+    "search": "Search for mods from the Factorio mod portal"
 }
 
 def get_action_names():
@@ -84,12 +86,31 @@ def cmd_install(args):
         for p in args:
             mp = modman.ModPack(p)
             if mp.exists:
-                mp.install()
+                print("Installing modpack: "+mp.name)
+                for msg in mp.install():
+                    print(msg, end="")
+                    sys.stdout.flush()
             else:
                 print("Mod pack \"{}\" does not exist.".format(p))
                 exit(1)
     else:
         print("Invalid argument count")
+        exit(1)
+
+def cmd_match(args):
+    if len(args) != 1:
+        print("Invalid argument count")
+        exit(1)
+
+    try:
+        for msg in modman.install_matching(args[0]):
+            print(msg, end="")
+            sys.stdout.flush()
+    except ConnectionRefusedError:
+        print("Could not connect to the server. Is it running?")
+        exit(1)
+    except RuntimeError as e:
+        print("Could not communicate with the server. Are you using same Factorio version?")
         exit(1)
 
 def cmd_search(args):

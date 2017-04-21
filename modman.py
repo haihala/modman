@@ -3,6 +3,7 @@ import os, sys, subprocess, base64
 from cache import *
 import mod_portal
 import factorio_folder
+import autodetect
 
 if sys.version_info[0] != 3:
     print("This program requires Python 3.")
@@ -94,8 +95,9 @@ class ModPack(object):
                      # If mod is in cache, get it.
                     cache.fetch(mod)
                 else:
+                    yield "Downloading: " + mod.name + "..."
                     mod.download_to(mod_folder)
-                    # TODO: progress message (using yield, maybe)
+                    yield " done\n"
             else:
                 # TODO: do something about this!
                 pass
@@ -109,3 +111,24 @@ def open_file_editor(filename):
 
 def modpacks():
     return [ModPack.from_filename(fname) for fname in os.listdir("modpacks") if fname.endswith(".txt")]
+
+
+def install_matching(server):
+    """Autodetect packages on a server, and install matching mods locally."""
+    # retrieve mod list here, so we can crash before altering cache if needed
+    mods = autodetect.detect_server_packages(server)
+
+    # chache old packages
+    mod_folder = factorio_folder.get()
+
+    # Initialize the cache
+    cache = Cache(mod_folder)
+
+    # Handle old mods
+    cache.cache_all()
+
+    for name, version in mods:
+        mod = mod_portal.Mod(name, version)
+        yield "Downloading: " + mod.name + "..."
+        mod.download_to(mod_folder)
+        yield " done\n"

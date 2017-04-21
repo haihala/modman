@@ -12,23 +12,36 @@ except ImportError:
 FACTORIO_BASEURL = "https://mods.factorio.com/"
 
 def download_file(url, path):
-    r = requests.get(url, stream=True)
-    with open(path, 'wb') as f:
-        for chunk in r.iter_content(chunk_size=1024):
-            if chunk: # filter out keep-alive new chunks
-                f.write(chunk)
+    r = requests.get(url, stream=True, headers={"User-Agent": "factorio"})
+    if r.headers["Content-Type"].strip().startswith("text/html"):
+        # login required
+        exit("LOGIN REQUIRED")
+        return False
+    else:
+        with open(path, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=1024):
+                if chunk: # filter out keep-alive new chunks
+                    f.write(chunk)
+        return True
 
 class Mod(object):
-    def __init__(self, name):
+    def __init__(self, name, version=None):
         self.name = name
+        self.pseudo = (name == "base")
+        self.required_version = version # None means newest
         self._info = None
 
     @property
     def url(self):
+        if self.pseudo:
+            raise RuntimeError("Pseudo mods do not have urls")
         return urljoin(FACTORIO_BASEURL, "/api/mods/"+self.name)
 
     @property
     def info(self):
+        if self.pseudo:
+            raise RuntimeError("Pseudo mods do not have info")
+
         r = requests.get(self.url)
         r.raise_for_status()
         # TODO: check for this ^^
@@ -41,14 +54,30 @@ class Mod(object):
 
     @property
     def exists(self):
+        if self.pseudo:
+            return True
         return bool(self.info)
 
     @property
     def release(self):
-        """Newest available version."""
-        return self._info["releases"][0]
+        """Required release version."""
+        if self.pseudo:
+            raise RuntimeError("Pseudo mods do not have release")
+
+        if self.required_version is None:
+            # newest
+            return self.info["releases"][0]
+        else:
+            # search for the correct version
+            for release in self.info["releases"]:
+                if release["version"] == self.required_version:
+                    return release
+            raise ValueError("Not found")
 
     def download_to(self, mod_folder):
+        if self.pseudo:
+            return
+
         assert self.exists
         url = urljoin(FACTORIO_BASEURL, self.release["download_url"])
         assert ".." not in url # too paranoid? never.
