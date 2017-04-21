@@ -9,7 +9,7 @@ class Keyring(object):
         This is a bit hacky, because we don't want to store usernames separately.
         Fields:
         * username: system username from getpass
-        * password: space-separated username-password pair
+        * password: newline-separated username-password pair
     """
     @staticmethod
     def keyring_name():
@@ -34,13 +34,13 @@ class Keyring(object):
         pair = keyring.get_password(APP_NAME, getuser())
         if pair is None:
             return None
-        assert " " in pair
-        return Credentials(*pair.split(" ", 1))
+        assert "\n" in pair
+        return Credentials(*pair.split("\n", 1))
 
     @staticmethod
     def set_credentials(cred):
         assert isinstance(cred, Credentials)
-        return keyring.set_password(APP_NAME, getuser(), " ".join([cred.username, cred.password]))
+        return keyring.set_password(APP_NAME, getuser(), "\n".join([cred.username, cred.password]))
 
 class Credentials(object):
     """User credentials for mod portal. Prompts for credentials only when needed."""
