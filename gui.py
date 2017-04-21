@@ -1,4 +1,5 @@
-#!python
+#!python3
+
 import sys
 import subprocess
 import os.path
