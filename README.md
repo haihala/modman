@@ -85,3 +85,11 @@ You can add your own mod files and modify the current ones freely.
 Installing a pack deletes or caches all .zip files in your mod folder. This is good to know if you store something in there. This also makes it so, re-installing a pack updates all the mods.
 
 If you want, you can freely reach me on reddit /u/hajhawa. I will gladly respond to any tech problems you might have (I'm sure there will be plenty). Alternatively, you could [open an issue on GitHub](https://github.com/haihala/modman/issues/new).
+
+
+## Development
+
+### Tests
+
+You can run automated tests by `python3 -m pytest`.
+You need pytest for this. It can be installed by `python3 -m pip install pytest`.
