@@ -1,5 +1,4 @@
 import base64
-import re
 
 from .cache import *
 from . import factorio_folder
@@ -46,11 +45,9 @@ class ModPack(object):
             if line == "" or line.startswith("#"):
                 continue
 
-            # Match to name and optionally a version
-            m = re.match(r"^([^ ]+)\s*(\d+\.\d+\.\d+)?$", line)
-            if m:
-                mods.append(Mod(*m.groups()))
-            else:
+            try:
+                mods.append(Mod.from_name(line))
+            except ValueError:
                 # incorrect line, ignored
                 # TODO: Should we show an error message?
                 continue

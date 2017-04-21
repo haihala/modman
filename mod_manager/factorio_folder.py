@@ -7,7 +7,7 @@ def default_folder():
     elif sys.platform.startswith("darwin"):
         return os.path.expanduser("~/Library/Application Support/factorio/mods")
     elif sys.platform.startswith("linux"):
-        return os.path.expanduser("~/.factorio")
+        return os.path.expanduser("~/.factorio/mods")
     else:
         return None
 
@@ -43,4 +43,5 @@ def get():
     if is_factorio_mods_folder(factorio_folder):
         return factorio_folder
     else:
-        return None
+        print("Could not determine factorio folder")
+        exit(1)

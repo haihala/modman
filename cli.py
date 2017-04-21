@@ -134,7 +134,8 @@ class CLI(object):
                     print("  (modpack is empty)")
                 else:
                     for mod in pack.contents:
-                        print(" "*2 + mod.name + " "*((maxlen-len(mod.name))+2) + mod.version)
+                        ver = mod.version + " (" + ("fixed" if mod.fixed_version else "floating") + ")"
+                        print(" "*2 + mod.name + " "*((maxlen-len(mod.name))+2) + ver)
 
     def cmd_edit(self, args):
         if len(args) != 1:
@@ -204,7 +205,7 @@ class CLI(object):
         if self.mod_manager.installed_mods:
             maxlen = max([len(mod.name) for mod in self.mod_manager.installed_mods])
             for mod in self.mod_manager.installed_mods:
-                print(" "*2 + mod.name + " "*((maxlen-len(mod.name))+2) + mod.version)
+                print(mod.name + " "*((maxlen-len(mod.name))+2) + mod.version)
         else:
             print("(no mods installed)")
 
