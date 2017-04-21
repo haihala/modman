@@ -1,4 +1,5 @@
 import base64
+import re
 
 from .cache import *
 from . import factorio_folder
@@ -38,9 +39,23 @@ class ModPack(object):
 
     @property
     def contents(self):
-        """List of modpack names."""
-        names = set([i.strip() for i in self.lines if i != "" and i[0] != "#"])
-        return [Mod(name) for name in names]
+        """List of modpacks in this package."""
+        mods = []
+        for line in self.lines:
+            line = line.strip()
+            if line == "" or line.startswith("#"):
+                continue
+
+            # Match to name and optionally a version
+            m = re.match(r"^([^ ]+)\s*(\d+\.\d+\.\d+)?$", line)
+            if m:
+                mods.append(Mod(*m.groups()))
+            else:
+                # incorrect line, ignored
+                # TODO: Should we show an error message?
+                continue
+
+        return mods
 
     @property
     def empty(self):

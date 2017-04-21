@@ -41,7 +41,18 @@ Install everything the program is dependent on. After installing dependencies, y
 
 ## Modpack format
 
-The modpack files stored in the modpack folder are all normal .txt files. The parser ignores empty lines and lines beginning with "#" (comments). All non-comment non-empty lines are interpreted as mod names.
+The modpack files stored in the modpack folder are all normal .txt files. The parser ignores empty lines and lines beginning with "#" (comments). All non-comment non-empty lines are interpreted as mod names. You can also require specific versions by adding their version number to after the mod name. These mods are not updated with other mods.
+
+```
+# Comments are allowed
+# Mods are listed in any order by name in mods.factorio.com url
+
+# Newest version of EvoGUI
+EvoGUI
+
+# Version 2.3.4 of RSO
+rso-mod 2.3.4
+```
 
 Mod names come from the mod portal. If you for example want to include a mod called Foo made by bar, the mod portal url should be: https://mods.factorio.com/mods/bar/Foo and you should add "Foo" to the modpack file.
 
