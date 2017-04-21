@@ -1,35 +1,35 @@
 # modman
-Factorio mod manager.
+A Factorio mod manager.
 
-## Usage:
+## Usage
 
 Before use, install dependencies. See Installation for more information.
 
-For graphical application, double click "gui.py" file. Help on how to use the tool can be found in this document.
+For graphical application, double click `gui.py` file. Help on how to use the tool can be found in this document.
 
-For command line tool, run "cli.py". This will print the help message, describing everything you can do.
+For command line tool, run `cli.py`. This will print the help message, describing everything you can do.
 
-## Installation:
+## Installation
 
 Install everything the program is dependent on. After installing dependencies, you should be able to run everything. Installer coming soon™.
 
-### Dependencies:
+### Dependencies
 
-#### Both CLI and GUI:
+#### Both CLI and GUI
 
 * Python3
     * Install from https://www.python.org/downloads/
 * Python3 requests
     * After installing python3:
-        * run "pip3 install requests" in terminal/cmd
+        * Run `pip3 install requests` in terminal/cmd
 
-#### For the GUI:
+#### For the GUI
 
 * Python3 PyQt5
     * After installing python3:
-        * run "pip3 install PyQt5" in terminal/cmd
+        * Run `pip3 install PyQt5` in terminal/cmd
 
-## Modpack format.
+## Modpack format
 
 The modpack files stored in the modpack folder are all normal .txt files. The parser ignores empty lines and lines beginning with "#" (comments). All non-comment non-empty lines are interpreted as mod names.
 
@@ -86,10 +86,8 @@ Installing a pack deletes or caches all .zip files in your mod folder. This is g
 
 If you want, you can freely reach me on reddit /u/hajhawa. I will gladly respond to any tech problems you might have (I'm sure there will be plenty). Alternatively, you could [open an issue on GitHub](https://github.com/haihala/modman/issues/new).
 
-
 ## Development
 
 ### Tests
-
 You can run automated tests by `python3 -m pytest`.
 You need pytest for this. It can be installed by `python3 -m pip install pytest`.
