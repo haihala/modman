@@ -1,5 +1,15 @@
 # modman
-A Factorio mod manager.
+A mod manager for [Factorio](https://www.factorio.com/).
+
+This tool allows you to:
+* Match to a mod configuration of a running server with a single command
+* Manage sets of mods, called modpacks
+* Enable and disable single mods
+* Easily share mod configuration to other players
+
+Hopefully this will become completely obsolete at some point as Factorio evolves, but until that this will be useful.
+
+This is **not** an offical Factorio product, just a useful tool developed by a few Factorio-addicted players.
 
 ## Usage
 
