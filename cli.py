@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
 
+try:
+    import requests
+except ImportError:
+    print("It looks like requests is not installed.")
+    print("Try this: pip3 install requests")
+    exit(1)
+
 import os
 import sys
 import subprocess
