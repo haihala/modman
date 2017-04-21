@@ -60,6 +60,7 @@ class CLI(object):
         "decompress <base64>",
         "install <packname>",
         "match <server_address>",
+        "enabled",
         "search <query>",
         "cache <action>"
     ]
@@ -73,6 +74,7 @@ class CLI(object):
         "decompress": "Unpacks a mod from base64 digest (overrides existing modpacks with the same name)",
         "install": "Despite what is in the mod folder, downloads the newest mods into the specified folder",
         "match": "Match your mod configuration to one in a server, using exactly same versions",
+        "enabled": "List enabled mods",
         "search": "Search for mods from the Factorio mod portal",
         "cache": "Manage cache. Actions: clear, list"
     }
@@ -193,6 +195,17 @@ class CLI(object):
         except BrokenPipeError:
             print("Could not communicate with the server. Are you using same Factorio version?")
             exit(1)
+
+    def cmd_enabled(self, args):
+        if len(args) != 0:
+            print("Invalid argument count")
+            exit(1)
+
+        if self.mod_manager.installed_mods:
+            for mod in self.mod_manager.installed_mods:
+                print(" "*2 + mod.name + " "*((maxlen-len(mod.name))+2) + mod.version)
+        else:
+            print("(no mods installed)")
 
     def cmd_search(self, args):
         results = self.mod_manager.mod_portal.search(" ".join(args))

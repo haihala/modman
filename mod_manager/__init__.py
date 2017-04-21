@@ -24,6 +24,13 @@ class ModManager(object):
     def modpacks(self):
         return [ModPack.from_filename(fname) for fname in os.listdir("modpacks") if fname.endswith(".txt")]
 
+    @property
+    def installed_mods(self):
+        files = [fname.rsplit(".", 1) for fname in os.listdir(factorio_folder.get()) if fname.endswith(".zip")]
+        print(factorio_folder.get())
+        print(os.listdir(factorio_folder.get()))
+        return [Mod(fname.rsplit("_", 1)) for fname in files]
+
     def install_pack(self, modpack):
         mod_folder = factorio_folder.get()
 
@@ -36,7 +43,7 @@ class ModManager(object):
         # Install new mods
         for mod in modpack.contents:
             if mod.exists:
-                if cache.version(mod, mod.release):
+                if cache.contains(mod):
                      # If mod is in cache, get it.
                     cache.fetch(mod)
                 else:

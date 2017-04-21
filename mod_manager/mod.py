@@ -102,5 +102,7 @@ class Mod(object):
     @property
     def download_url(self):
         assert not self.pseudo, "Pseudo mods do not have download url"
-        assert ".." not in self.release["download_url"] # too paranoid? never.
+        # too paranoid? never.
+        assert ".." not in self.release["download_url"]
+        assert self.release["download_url"].endswith(".zip")
         return urljoin(config.FACTORIO_BASEURL, self.release["download_url"])
