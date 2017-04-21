@@ -163,7 +163,7 @@ class CLI(object):
             print("Invalid argument count")
             exit(1)
 
-        self.mod_manager.ModPack.decompress(args[0]).save()
+        mod_manager.modpack.ModPack.decompress(args[0]).save()
 
     def cmd_install(self, args):
         if args:
@@ -213,7 +213,7 @@ class CLI(object):
         results = self.mod_manager.mod_portal.search(" ".join(args))
 
         for i,s in enumerate(results):
-            print("{}. {}: {} ({} downloads)".format(i+1, s.name, s.title, s.downloads))
+            print("{}. {}: {} ({} downloads)".format(i+1, s.name, s.title, s.downloads_count))
 
     def cmd_cache(self, args):
         if len(args) != 1:

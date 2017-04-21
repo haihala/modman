@@ -17,11 +17,12 @@ class Mod(object):
         return Mod(*m.groups())
 
     @classmethod
-    def from_search(self, search_result):
+    def from_search(cls, data):
         self = cls(data["name"])
-        self._title = data["title"]
-        self._downloads = data["downloads_count"]
+        self.title = data["title"]
+        self.downloads_count = data["downloads_count"]
         self._releases = [data["latest_release"]]
+        self._exists = True
         return self
 
     def __init__(self, name, version=None):
@@ -30,6 +31,7 @@ class Mod(object):
         self.required_version = version # None means newest
         self._releases = None
         self._installed_version = None
+        self._exists = None
 
         if not self.pseudo and self.any_version_installed:
             with zipfile.ZipFile(os.path.join(factorio_folder.get(), self.name)) as zf:
@@ -37,15 +39,19 @@ class Mod(object):
                 assert info_json_candidates, "Not a mod file"
                 with zf.open(info_json_candidates[0]) as f:
                     data = json.load(f)
-            self._title = data["title"]
+            self.title = data["title"]
             self._installed_version = data["version"]
+            self._exists = True
 
     @property
     def exists(self):
         """Tests if this mod exists."""
         if self.pseudo:
             return True
-        return bool(self.info)
+        if self._exists == None:
+            if self.releases is None:
+                return False
+        return bool(self._exists)
 
     @property
     def any_version_installed(self):
@@ -123,8 +129,11 @@ class Mod(object):
             data = r.json()
             if len(data) == 1:
                 assert parsed["detail"] == "Not found."
+                self._exists = False
+                return None
 
-            self.releases = data["releases"]
+            self._releases = data["releases"]
+            self._exists = True
         return self._releases
 
     @property
