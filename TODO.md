@@ -8,3 +8,6 @@
 * **Mod caching**
     * Instead of deleting mods, newest versions of mods are stored in a subfolder in the mods folder.
     * If cached mod is in the latest version, use them instead of downloading new ones.
+* **Interactive cli**
+    * ```python cli.py interactive``` to start interactive cli modmanager
+* **Server launching and managing script** 
