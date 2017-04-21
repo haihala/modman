@@ -65,6 +65,7 @@ class ModManager(object):
 
         for name, version in mods:
             mod = Mod(name, version)
-            yield "Downloading: " + mod.name + "..."
-            self.mod_portal.download(mod)
-            yield " done\n"
+            if not mod.pseudo:
+                yield "Downloading: " + mod.name + "..."
+                self.mod_portal.download(mod)
+                yield " done\n"
