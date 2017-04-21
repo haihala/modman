@@ -47,7 +47,7 @@ class Mod(object):
                 info_json_candidates = [n for n in zf.namelist() if n.rsplit("/", 1)[1] == "info.json"]
                 assert info_json_candidates, "Not a mod file"
                 with zf.open(info_json_candidates[0]) as f:
-                    data = json.load(f)
+                    data = json.loads(f.read().decode())
             self.title = data["title"]
             self._installed_version = data["version"]
             self._exists = True
