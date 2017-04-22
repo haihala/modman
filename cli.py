@@ -65,7 +65,8 @@ class CLI(object):
         "disable <modname>",
         "search <query> [-n <integer>]",
         "credentials <action> [args]",
-        "cache <action>"
+        "cache <action>",
+        "apicache <action>",
     ]
 
     HELP = {
@@ -82,7 +83,8 @@ class CLI(object):
         "disable": "Disable a single mod",
         "search": "Search for mods from the Factorio mod portal. Specify the amount of results with -n parameter. By default 5 results are displayed.",
         "credentials": "Manage mod portal credentials. Actions: set, set [username] [password], clear",
-        "cache": "Manage cache. Actions: clear, list"
+        "cache": "Manage cache. Actions: reset, list",
+        "apicache": "Manage api call cache. Actions: reset"
     }
 
     ACTION_NAMES = [a.split()[0] for a in ACTIONS]
@@ -169,7 +171,7 @@ class CLI(object):
             print("Invalid argument count")
             exit(1)
 
-        mod_manager.modpack.ModPack.decompress(args[0]).save()
+        self.mod_manager.decompress_modpack(args[0]).save()
 
     def cmd_install(self, args):
         if args:
@@ -271,20 +273,32 @@ class CLI(object):
             print("Invalid argument count")
             exit(1)
 
-        if args[0] == "clear":
-            self.mod_manager.cache.clear()
+        if args[0] == "reset":
+            self.mod_manager.mod_cache.reset()
         elif args[0] == "list":
-            mods = [fname.rsplit(".", 1)[0].rsplit("_", 1) for fname in  self.mod_manager.cache.files]
+            mods = self.mod_manager.mod_cache.mods
             if mods:
-                maxlen = max([len(x[0]) for x in mods])
-                for name, version in mods:
-                    print(name + " "*((maxlen-len(name))+2) + version)
+                maxlen = max([len(x.name) for x in mods])
+                for cmod in mods:
+                    print(cmod.name + " "*((maxlen-len(cmod.name))+2) + cmod.version)
             else:
                 print("(no cached mods)")
         else:
             print("Invalid arguments")
             print("Usage: cache <action>")
-            print("Actions: clear, list")
+            print("Actions: reset, list")
+            exit(1)
+
+    def cmd_apicache(self, args):
+        if len(args) != 1:
+            print("Invalid argument count")
+            exit(1)
+
+        if args[0] == "reset":
+            self.mod_manager.mod_portal.api_cache.reset()
+        else:
+            print("Invalid arguments")
+            print("Usage: cache reset")
             exit(1)
 
     def run(self, cmd):

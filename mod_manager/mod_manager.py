@@ -9,16 +9,16 @@ from .mod_cache import ModCache
 
 class ModManager(object):
     def __init__(self):
-        self.mod_portal = ModPortal()
-        self.cache = ModCache()
+        self.mod_portal = ModPortal(self)
+        self.mod_cache = ModCache(self)
 
     def get_pack(self, pack_name):
-        return ModPack(pack_name)
+        return ModPack(self, pack_name)
 
     @property
     def modpacks(self):
         """A list of all available modpacks."""
-        return [ModPack.from_filename(fname) for fname in modpack_folder.files if fname.endswith(".txt")]
+        return [ModPack.from_filename(self, fname) for fname in modpack_folder.files if fname.endswith(".txt")]
 
     @property
     def installed_mods(self):
@@ -26,17 +26,22 @@ class ModManager(object):
         mods = []
         for fname in mod_folder.files:
             if os.path.isfile(mod_folder.file_path(fname)) and fname[0] != "." and not fname.endswith(".json"):
-                mods.append(Mod(fname))
+                mods.append(Mod(self.mod_portal.api_cache, fname))
         return mods
+
+    def decompress_modpack(self, data):
+        return ModPack.decompress(self, data)
 
     def install_mod(self, mod):
         """Installs a mod."""
         if mod.pseudo:
             return
 
-        if self.cache.contains(mod):
-            self.cache.fetch(mod)
+        if self.mod_cache.contains(mod):
+            self.mod_cache.fetch(mod)
         else:
+            self.mod_portal.login()
+
             self.mod_portal.download(mod)
             # TODO: process faults ^^
 
@@ -45,7 +50,7 @@ class ModManager(object):
             Installs listed mods and disables others.
             Periodically yields Mods and Nones. Yielding a Mod means that the installation is stating, and None means that it completed.
         """
-        self.cache.cache_all()
+        self.mod_cache.cache_all()
         for mod in mods:
             assert mod.exists
             yield mod
@@ -78,4 +83,4 @@ class ModManager(object):
         # retrieve mod list here, so we can crash before altering cache if needed
         mods = autodetect.detect_server_packages(server)
 
-        return self.set_mods([Mod(name, version) for name, version in mods])
+        return self.set_mods([Mod(self.mod_portal.api_cache, name, version) for name, version in mods])

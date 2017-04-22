@@ -18,7 +18,7 @@ Install Python 3 from https://www.python.org/downloads/.
 After installing Python 3 run
 
 ```
-pip3 install requests keyring
+pip3 install requests lxml bs4 keyring appdirs
 ```
 
 in terminal or cmd.

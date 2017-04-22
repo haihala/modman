@@ -1,7 +1,6 @@
 import os
 import re
 from urllib.parse import urljoin
-import requests
 import json
 import zipfile
 
@@ -16,25 +15,26 @@ class Mod(object):
     """
 
     @classmethod
-    def from_name(cls, name):
+    def from_name(cls, manager, name):
         """Creates a mod instance from a mod name and optionally a version."""
         # Match to name and optionally a version
         m = re.match(r"^([^ ]+)\s*(\d+\.\d+\.\d+)?$", name.strip())
         if not m:
             raise ValueError("Invalid mod string \"{}\"".format(name))
-        return Mod(*m.groups())
+        return cls(manager, *m.groups())
 
     @classmethod
-    def from_search(cls, data):
+    def from_search(cls, manager, data):
         """Creates a mod instance from a search result."""
-        self = cls(data["name"])
+        self = cls(manager, data["name"])
         self.title = data["title"]
         self.downloads_count = data["downloads_count"]
         self._releases = [data["latest_release"]]
         self._exists = True
         return self
 
-    def __init__(self, name, version=None):
+    def __init__(self, manager, name, version=None):
+        self.manager = manager
         self.name = name
         self.pseudo = (name == "base")
         self.required_version = version # None means newest
@@ -43,11 +43,16 @@ class Mod(object):
         self._exists = None
 
         if not self.pseudo and self.any_version_installed:
-            with zipfile.ZipFile(mod_folder.file_path(self.name)) as zf:
-                info_json_candidates = [n for n in zf.namelist() if n.rsplit("/", 1)[1] == "info.json"]
-                assert info_json_candidates, "Not a mod file"
-                with zf.open(info_json_candidates[0]) as f:
-                    data = json.loads(f.read().decode())
+            try:
+                with zipfile.ZipFile(mod_folder.file_path(self.name)) as zf:
+                    info_json_candidates = [n for n in zf.namelist() if n.rsplit("/", 1)[1] == "info.json"]
+                    assert info_json_candidates, "Not a mod file"
+                    with zf.open(info_json_candidates[0]) as f:
+                        data = json.loads(f.read().decode())
+            except zipfile.BadZipfile:
+                print("Error: Zipfile '{}' is probably corrupted".format(mod_folder.file_path(self.name)))
+                exit(1)
+
             self.title = data["title"]
             self._installed_version = data["version"]
             self._exists = True
@@ -145,25 +150,15 @@ class Mod(object):
         assert not self.pseudo, "Pseudo mods do not have info"
 
         if not self._releases:
-            r = requests.get(self.url)
-
-            r.raise_for_status()
-            # TODO: check for this ^^, or for r.status_code != 200
-
-            data = r.json()
-            if len(data) == 1:
-                assert parsed["detail"] == "Not found."
-                self._exists = False
-                return None
-
-            self._releases = data["releases"]
-            self._exists = True
+            self._releases = self.manager.mod_portal.releases(self)
+            self._exists = bool(self._releases)
         return self._releases
 
     @property
     def release(self):
         """Required release version info."""
         assert not self.pseudo, "Pseudo mods do not have releases"
+        assert self.exists, "Only mods that exist can have release"
 
         if self.fixed_version:
             # search for the correct version
@@ -182,3 +177,6 @@ class Mod(object):
         assert ".." not in self.release["download_url"]
         assert self.release["download_url"].endswith(".zip")
         return urljoin(config.FACTORIO_BASEURL, self.release["download_url"])
+
+    def __str__(self):
+        return "Mod({}, {})".format(self.name, self.version)

@@ -2,7 +2,7 @@ import base64
 
 from .mod import Mod
 from .folders import modpack_folder
-from .cache import *
+from .mod_cache import *
 
 MODPACK_TEMPLATE = "# Comments are allowed\n# Mods are listed in any order by name in mods.factorio.com url\n\n"
 
@@ -16,11 +16,12 @@ class ModPack(object):
         return "".join(["_" if c in FORBIDDEN_CHARS else c for c in name])
 
     @classmethod
-    def from_filename(cls, filename):
+    def from_filename(cls, manager, filename):
         """Create a ModPack object from filename."""
-        return cls(os.path.basename(filename).rsplit(".", 1)[0])
+        return cls(manager, os.path.basename(filename).rsplit(".", 1)[0])
 
-    def __init__(self, name):
+    def __init__(self, manager, name):
+        self.manager = manager
         self.name = ModPack.clean_name(name)
         self._lines = None
 
@@ -46,7 +47,7 @@ class ModPack(object):
                 continue
 
             try:
-                mods.append(Mod.from_name(line))
+                mods.append(Mod.from_name(self.manager, line))
             except ValueError:
                 # incorrect line, ignored
                 # TODO: Should we show an error message?
@@ -88,10 +89,13 @@ class ModPack(object):
         return base64.b64encode(data.encode()).decode()
 
     @classmethod
-    def decompress(cls, data):
+    def decompress(cls, manager, data):
         """Creates a new instance fron base64 string created by compress."""
         info = base64.b64decode(data.encode()).decode()
         name, contents = info.split("\n", 1)
-        self = cls(name)
+        self = cls(manager, name)
         self._lines = contents.split("\n")
         return self
+
+    def __str__(self):
+        return "ModPack({})".format(self.name)

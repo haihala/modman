@@ -1,6 +1,9 @@
 import os
 import sys
 import shutil
+import appdirs
+
+from .config import APP_NAME
 
 def default_folder():
     """Returns default factorio mod folder for the current OS."""
@@ -42,19 +45,24 @@ def get_factorio_folder():
         if is_factorio_main_folder(factorio_folder):
             factorio_folder = os.path.join(factorio_folder, "mods")
 
-    if is_factorio_mods_folder(factorio_folder):
+    if factorio_folder and is_factorio_mods_folder(factorio_folder):
         return factorio_folder
     else:
         print("Could not determine factorio folder")
         exit(1)
 
-def get_cache_folder():
-    cache_path = os.path.join(mod_folder.path, "cache")
-    if not os.path.isdir(cache_path):
-        os.makedirs(cache_path)
+def get_mod_cache_folder():
+    cache = os.path.join(mod_folder.path, "cache")
+    if not os.path.isdir(cache):
+        os.makedirs(cache)
+    return cache
 
-    return os.path.join(mod_folder.path, "cache")
-
+def get_api_cache_folder():
+    # NOTE: Using app name for author too
+    cache = appdirs.user_cache_dir(APP_NAME, APP_NAME)
+    if not os.path.isdir(cache):
+        os.makedirs(cache)
+    return cache
 
 class _MetaFolder(type):
     @property
@@ -93,9 +101,13 @@ class mod_folder(Folder):
     """Factorio mod folder."""
     path = get_factorio_folder()
 
-class cache_folder(Folder):
+class mod_cache_folder(Folder):
     """Mod cache folder."""
-    path = get_cache_folder()
+    path = get_mod_cache_folder()
+
+class api_cache_folder(Folder):
+    """Api cache folder."""
+    path = get_api_cache_folder()
 
 class modpack_folder(Folder):
     """Application modpack folder."""
