@@ -4,6 +4,7 @@ import shutil
 import appdirs
 
 from .config import APP_NAME
+from .exceptions import FactorioFolderNotFound
 
 def default_folder():
     """Returns default factorio mod folder for the current OS."""
@@ -48,8 +49,7 @@ def get_factorio_folder():
     if factorio_folder and is_factorio_mods_folder(factorio_folder):
         return factorio_folder
     else:
-        print("Could not determine factorio folder")
-        exit(1)
+        raise FactorioFolderNotFound()
 
 def get_mod_cache_folder():
     cache = os.path.join(mod_folder.path, "cache")

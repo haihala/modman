@@ -1,6 +1,5 @@
 import os
 from urllib.parse import urljoin
-import re
 
 from .folders import mod_folder
 from .mod import Mod

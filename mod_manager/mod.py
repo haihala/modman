@@ -6,6 +6,7 @@ import zipfile
 
 from . import config
 from .folders import mod_folder
+from .exceptions import CorruptedZipFile
 
 class Mod(object):
     """
@@ -50,8 +51,7 @@ class Mod(object):
                     with zf.open(info_json_candidates[0]) as f:
                         data = json.loads(f.read().decode())
             except zipfile.BadZipfile:
-                print("Error: Zipfile '{}' is probably corrupted".format(mod_folder.file_path(self.name)))
-                exit(1)
+                raise CorruptedZipFile(mod_folder.file_path(self.name))
 
             self.title = data["title"]
             self._installed_version = data["version"]

@@ -7,6 +7,7 @@ import json
 
 from .config import FACTORIO_BASEURL, API_CACHE_SECONDS
 from .folders import api_cache_folder
+from .exceptions import AuthenticationError, LoginError, ReLoginError
 
 class ApiCache(object):
     def __init__(self):
@@ -38,7 +39,10 @@ class ApiCache(object):
             headers={"Referer": "https://www.factorio.com/login"}
         )
 
-        self.logged_in = "Invalid username or password" not in r.text
+        if "Invalid username or password" not in r.text:
+            raise LoginError()
+
+        self.logged_in = True
         return self.logged_in
 
     def reset(self):
@@ -91,14 +95,8 @@ class ApiCache(object):
 
             if allow_relogin:
                 ok = self.login(self.credentials)
-                if ok:
-                    return self.get_zip(allow_relogin=False)
-                else:
-                    print("Could not log in again.")
-                    print("Maybe you have changed your password?")
-                    exit(2)
-
-            print("Could not download {}".format(url))
-            exit(2)
-
+                if not ok:
+                    raise ReLoginError()
+                return self.get_zip(url, allow_relogin=False)
+            raise AuthenticationError()
         return r

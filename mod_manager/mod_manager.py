@@ -4,8 +4,9 @@ from . import autodetect
 from .modpack import ModPack
 from .mod_portal import ModPortal
 from .mod import Mod
-from .folders import mod_folder, modpack_folder
 from .mod_cache import ModCache
+from .folders import mod_folder, modpack_folder
+from .exceptions import InstallationVersionConflict
 
 class ModManager(object):
     def __init__(self):
@@ -70,8 +71,7 @@ class ModManager(object):
                 for m in mods:
                     if mod.name == m.name:
                         if not mod.equals(m):
-                            print("Error: Conflicting versions")
-                            exit(2)
+                            raise InstallationVersionConflict()
 
                         # already added
                         continue
