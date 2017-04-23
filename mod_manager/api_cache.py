@@ -43,7 +43,6 @@ class ApiCache(object):
             raise LoginError()
 
         self.logged_in = True
-        return self.logged_in
 
     def reset(self):
         self.db.execute("DELETE FROM json_request_cache")

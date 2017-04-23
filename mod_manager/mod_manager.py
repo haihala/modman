@@ -36,14 +36,14 @@ class ModManager(object):
 
     def install_mod(self, mod):
         """Installs a mod."""
+        assert self.mod_portal.logged_in, "Must be logged in to download mods"
+
         if mod.pseudo:
             return
 
         if self.mod_cache.contains(mod):
             self.mod_cache.fetch(mod)
         else:
-            self.mod_portal.login()
-
             self.mod_portal.download(mod)
             # TODO: process faults ^^
 
