@@ -92,14 +92,21 @@ class CLI(object):
     def __init__(self):
         self.mod_manager = mod_manager.ModManager()
 
+    def print_2col_table(self, rows, indent=0, empty_msg=None):
+        if rows:
+            c1_max_width = max([len(c1) for c1, c2 in rows])
+
+            for c1, c2 in rows:
+                print("".join([" "*2*indent, c1, " "*(c1_max_width - len(c1) + 2), c2]))
+        elif empty_msg:
+            print("({})".format(empty_msg))
+
     def cmd_help(self, args):
         if args == []:
             print("")
             print("Usage: {} [action] [args]".format(sys.argv[0]))
             print("")
-            maxlen = max(map(len, self.ACTIONS))
-            for action in self.ACTIONS:
-                print("  "+action+" "*(maxlen-len(action)+2)+self.HELP[action.split()[0]])
+            self.print_2col_table([(action, self.HELP[action.split()[0]]) for action in self.ACTIONS], indent=1)
             print("")
         elif args[0] in self.ACTION_NAMES:
             action = [a for a in self.ACTIONS if a.startswith(args[0])][0]
@@ -211,12 +218,10 @@ class CLI(object):
             print("Invalid argument count")
             exit(1)
 
-        if self.mod_manager.installed_mods:
-            maxlen = max([len(mod.name) for mod in self.mod_manager.installed_mods])
-            for mod in self.mod_manager.installed_mods:
-                print(mod.name + " "*((maxlen-len(mod.name))+2) + mod.version)
-        else:
-            print("(no mods installed)")
+        self.print_2col_table(
+            [(mod.name, mod.version) for mod in self.mod_manager.installed_mods],
+            empty_msg="no mods enabled"
+        )
 
     def cmd_search(self, args):
         search_args = " ".join(args)
@@ -276,13 +281,10 @@ class CLI(object):
         if args[0] == "reset":
             self.mod_manager.mod_cache.reset()
         elif args[0] == "list":
-            mods = self.mod_manager.mod_cache.mods
-            if mods:
-                maxlen = max([len(x.name) for x in mods])
-                for cmod in mods:
-                    print(cmod.name + " "*((maxlen-len(cmod.name))+2) + cmod.version)
-            else:
-                print("(no cached mods)")
+            self.print_2col_table(
+                [(cmod.name, cmod.version) for cmod in self.mod_manager.mod_cache.mods],
+                empty_msg="no cached mods"
+            )
         else:
             print("Invalid arguments")
             print("Usage: cache <action>")
