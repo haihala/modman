@@ -39,7 +39,7 @@ class ApiCache(object):
             headers={"Referer": "https://www.factorio.com/login"}
         )
 
-        if "Invalid username or password" not in r.text:
+        if "Invalid username or password" in r.text:
             raise LoginError()
 
         self.logged_in = True

@@ -6,7 +6,7 @@ from .mod_portal import ModPortal
 from .mod import Mod
 from .mod_cache import ModCache
 from .folders import mod_folder, modpack_folder
-from .progress import ProgressStep
+from .progress import InstallationProgressStep
 from .exceptions import InstallationVersionConflict
 
 class ModManager(object):
@@ -54,10 +54,12 @@ class ModManager(object):
             Mod means that the installation is stating, and None means that it completed.
         """
         self.mod_cache.cache_all()
-        for mod in mods:
-            callback(ProgressStep(mod, "Installing {}... ".format(mod.name)))
+        for i, mod in enumerate(mods):
+            callback(InstallationProgressStep(mod, True, i/(len(mods)*2)))
+
             self.install_mod(mod)
-            callback(ProgressStep(mod), "done\n")
+
+            callback(InstallationProgressStep(mod, False, (i+1)/(len(mods)*2)))
 
     def install_packs(self, modpacks, callback=None):
         """
