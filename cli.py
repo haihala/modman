@@ -92,7 +92,7 @@ class CLI(object):
     ACTION_NAMES = [a.split()[0] for a in ACTIONS]
 
     def __init__(self):
-        self.mod_manager = mod_manager.ModManager()
+        self.mod_manager = mod_manager.ModManager(login_callback=self.login)
 
     def print_progress_message(self, step):
         print(step.message, end="")
@@ -209,8 +209,6 @@ class CLI(object):
         self.mod_manager.decompress_modpack(args[0]).save()
 
     def cmd_install(self, args):
-        self.login()
-
         if args:
             packs = []
             for p in args:
@@ -230,8 +228,6 @@ class CLI(object):
         if len(args) != 1:
             print("Invalid argument count")
             exit(1)
-
-        self.login()
 
         try:
             self.mod_manager.install_matching(args[0], callback=self.print_progress_message)
