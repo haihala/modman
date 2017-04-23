@@ -92,6 +92,10 @@ class CLI(object):
     def __init__(self):
         self.mod_manager = mod_manager.ModManager()
 
+    def print_progress_message(self, step):
+        print(step.message, end="")
+        sys.stdout.flush()
+
     def print_2col_table(self, rows, indent=0, empty_msg=None):
         if rows:
             c1_max_width = max([len(c1) for c1, c2 in rows])
@@ -190,9 +194,8 @@ class CLI(object):
                 else:
                     print("Mod pack \"{}\" does not exist.".format(p))
                     exit(1)
-            for msg in self.mod_manager.install_packs(packs):
-                print("done\n" if msg is None else "Installing {}... ".format(msg.name), end="")
-                sys.stdout.flush()
+
+            self.mod_manager.install_packs(packs, self.print_progress_message)
         else:
             print("Invalid argument count")
             exit(1)
@@ -203,9 +206,7 @@ class CLI(object):
             exit(1)
 
         try:
-            for msg in self.mod_manager.install_matching(args[0]):
-                print("done\n" if msg is None else "Installing {}... ".format(msg.name), end="")
-                sys.stdout.flush()
+            self.mod_manager.install_matching(args[0], callback=self.print_progress_message)
         except ConnectionRefusedError:
             print("Could not connect to the server. Is it running?")
             exit(1)

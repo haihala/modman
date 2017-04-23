@@ -6,6 +6,7 @@ from .mod_portal import ModPortal
 from .mod import Mod
 from .mod_cache import ModCache
 from .folders import mod_folder, modpack_folder
+from .progress import ProgressStep
 from .exceptions import InstallationVersionConflict
 
 class ModManager(object):
@@ -46,19 +47,19 @@ class ModManager(object):
             self.mod_portal.download(mod)
             # TODO: process faults ^^
 
-    def set_mods(self, mods):
+    def set_mods(self, mods, callback=None):
         """
             Installs listed mods and disables others.
-            Periodically yields Mods and Nones. Yielding a Mod means that the installation is stating, and None means that it completed.
+            Periodically calls callback with Mods and Nones.
+            Mod means that the installation is stating, and None means that it completed.
         """
         self.mod_cache.cache_all()
         for mod in mods:
-            assert mod.exists
-            yield mod
+            callback(ProgressStep(mod, "Installing {}... ".format(mod.name)))
             self.install_mod(mod)
-            yield None
+            callback(ProgressStep(mod), "done\n")
 
-    def install_packs(self, modpacks):
+    def install_packs(self, modpacks, callback=None):
         """
             Installs all mods in given packages, disabling other mods.
             If mulitple versions of a mod are required, exit with an error message.
@@ -76,11 +77,11 @@ class ModManager(object):
                         # already added
                         continue
                 mods.append(mod)
-        return self.set_mods(mods)
+        return self.set_mods(mods, callback)
 
-    def install_matching(self, server):
+    def install_matching(self, server, callback=None):
         """Autodetect packages on a server, and install matching mods locally."""
         # retrieve mod list here, so we can crash before altering cache if needed
         mods = autodetect.detect_server_packages(server)
 
-        return self.set_mods([Mod(self.mod_portal.api_cache, name, version) for name, version in mods])
+        return self.set_mods([Mod(self.mod_portal.api_cache, name, ver) for name, ver in mods], callback)
