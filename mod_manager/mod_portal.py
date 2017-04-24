@@ -46,7 +46,7 @@ class ModPortal(object):
         return data["releases"]
 
     def download(self, mod):
-        self._download_file(mod.download_url, mod_folder.file_path(mod.url.rsplit("/", 1)[1]))
+        self._download_file(mod.download_url, mod_folder.file_path(mod.download_url.rsplit("/", 1)[1]))
 
     def _download_file(self, url, path):
         r = self.api_cache.get_zip(url)
