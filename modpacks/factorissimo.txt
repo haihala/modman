@@ -1,0 +1,3 @@
+# Test for modpack inheritance
+!vanilla+
+Factorissimo

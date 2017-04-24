@@ -9,4 +9,3 @@ research-queue
 Bottleneck
 RailTanker
 long-reach
-Factorissimo
