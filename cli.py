@@ -326,7 +326,7 @@ class CLI(object):
             self.mod_manager.mod_portal.api_cache.reset()
         else:
             print("Invalid arguments")
-            print("Usage: cache reset")
+            print("Usage: apicache reset")
             exit(1)
 
     def run(self, cmd):
