@@ -1,2 +1,1 @@
-# Comments are allowed
-# Mods are listed in any order by name in mods.factorio.com url
+# Blank modpack

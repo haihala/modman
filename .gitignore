@@ -33,4 +33,4 @@ pip-delete-this-directory.txt
 
 # Project specific
 modman.conf
-modpacks/
+# modpacks/

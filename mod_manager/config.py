@@ -6,3 +6,6 @@ FACTORIO_LOGINURL = "https://auth.factorio.com/login/process"
 
 # Set this to 0 or None to disable api request caching
 API_CACHE_SECONDS = 60*60
+
+# Prefix for modpack inheritance
+MODPACK_INHERITANCE_PREFIX = "!"

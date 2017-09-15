@@ -10,8 +10,10 @@ except ImportError:
 import os
 import sys
 import subprocess
+from getpass import getpass
 
 import mod_manager
+from mod_manager.exceptions import LoginError
 
 def open_gui_editor(filename):
     """Opens default GUI text editor."""
@@ -90,7 +92,7 @@ class CLI(object):
     ACTION_NAMES = [a.split()[0] for a in ACTIONS]
 
     def __init__(self):
-        self.mod_manager = mod_manager.ModManager()
+        self.mod_manager = mod_manager.ModManager(login_callback=self.login)
 
     def print_progress_message(self, step):
         print(step.message, end="")
@@ -104,6 +106,28 @@ class CLI(object):
                 print("".join([" "*2*indent, c1, " "*(c1_max_width - len(c1) + 2), c2]))
         elif empty_msg:
             print("({})".format(empty_msg))
+
+    def prompt_credentials(self):
+        print("")
+        print("Logging in to Factorio mod portal")
+        print("(Password will not be displayed.)")
+        username = input("Username: ")
+        password = getpass("Password: ")
+        print("")
+
+        return mod_manager.credentials.Credentials(username, password)
+
+    def login(self):
+        if not mod_manager.credentials.Keyring.credentials_stored:
+            cred = self.prompt_credentials()
+        else:
+            cred = None
+
+        try:
+            self.mod_manager.mod_portal.login(cred)
+        except LoginError:
+            print("Could not log in to the mod portal.")
+            exit(1)
 
     def cmd_help(self, args):
         if args == []:
@@ -257,19 +281,20 @@ class CLI(object):
 
         elif args[0] == "set":
             if len(args) == 1:
-                c = mod_manager.credentials.Credentials()
-                c.prompt()
+                c = self.prompt_credentials()
             else:
                 c = mod_manager.credentials.Credentials(*args[1:])
-                if not c.ok:
-                    print("Invalid credentials: minimun lengths are:")
-                    print("{} for username and {} for password".format(
-                        mod_manager.credentials.Credentials.USERNAME_MIN,
-                        mod_manager.credentials.Credentials.PASSWORD_MIN
-                    ))
-                    exit(1)
 
-            mod_manager.credentials.Keyring.set_credentials(c)
+            print("Verifying... ", end="")
+            sys.stdout.flush()
+            try:
+                self.mod_manager.mod_portal.login(c)
+            except LoginError:
+                print("invalid credentials")
+                exit(1)
+            else:
+                print("ok")
+                mod_manager.credentials.Keyring.set_credentials(c)
         else:
             print("Invalid action \"{}\"".format(args[0]))
             exit(1)
@@ -301,7 +326,7 @@ class CLI(object):
             self.mod_manager.mod_portal.api_cache.reset()
         else:
             print("Invalid arguments")
-            print("Usage: cache reset")
+            print("Usage: apicache reset")
             exit(1)
 
     def run(self, cmd):

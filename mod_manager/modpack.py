@@ -3,6 +3,7 @@ import base64
 from .mod import Mod
 from .folders import modpack_folder
 from .mod_cache import *
+from .config import MODPACK_INHERITANCE_PREFIX
 
 MODPACK_TEMPLATE = "# Comments are allowed\n# Mods are listed in any order by name in mods.factorio.com url\n\n"
 
@@ -45,14 +46,18 @@ class ModPack(object):
             line = line.strip()
             if line == "" or line.startswith("#"):
                 continue
-
+            if line.startswith(MODPACK_INHERITANCE_PREFIX):
+                submodpack_name = line.rsplit(MODPACK_INHERITANCE_PREFIX, 1)[1]
+                submodpack = ModPack(self.manager, submodpack_name)
+                mods.extend(submodpack.contents)
+                continue
             try:
                 mods.append(Mod.from_name(self.manager, line))
             except ValueError:
                 # incorrect line, ignored
                 # TODO: Should we show an error message?
                 continue
-
+            # TODO: Should we remove duplicates? If there are different versions of the same mod, which one should we keep?
         return mods
 
     @property

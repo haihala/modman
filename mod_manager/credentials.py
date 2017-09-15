@@ -1,5 +1,5 @@
-from .config import APP_NAME, FACTORIO_BASEURL
-from getpass import getuser, getpass
+from .config import APP_NAME
+from getpass import getuser
 
 import keyring
 
@@ -45,38 +45,16 @@ class Keyring(object):
 class Credentials(object):
     """User credentials for mod portal. Prompts for credentials only when needed."""
 
-    # Found by trying to create account
+    # Found by trying to create an account
     USERNAME_MIN = 2
     PASSWORD_MIN = 5
 
     def __init__(self, username=None, password=None):
-        self._username = username
-        self._password = password
-
-    @property
-    def username(self):
-        if self._username is None:
-            self.prompt()
-        return self._username
-
-    @property
-    def password(self):
-        if self._password is None:
-            self.prompt()
-        return self._password
+        self.username = username
+        self.password = password
 
     @property
     def ok(self):
-        un = self._username and len(self._username) >= self.USERNAME_MIN
-        pw = self._password and len(self._password) >= self.PASSWORD_MIN
-        return un and pw
-
-    def prompt(self):
-        print("")
-        print("Logging in to {}:".format(FACTORIO_BASEURL))
-        print("Password will not be displayed.")
-        while self._username is None or len(self.username) < self.USERNAME_MIN:
-            self._username = input("Username: ")
-        while self._password is None or len(self.password) < self.PASSWORD_MIN:
-            self._password = getpass("Password: ")
-        print("")
+        un_ok = self.username and len(self.username) >= self.USERNAME_MIN
+        pw_ok = self.password and len(self.password) >= self.PASSWORD_MIN
+        return un_ok and pw_ok

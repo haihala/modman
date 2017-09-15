@@ -10,7 +10,8 @@ from .progress import InstallationProgressStep
 from .exceptions import InstallationVersionConflict
 
 class ModManager(object):
-    def __init__(self):
+    def __init__(self, login_callback=None):
+        self.login_callback = login_callback
         self.mod_portal = ModPortal(self)
         self.mod_cache = ModCache(self)
 
@@ -36,14 +37,15 @@ class ModManager(object):
 
     def install_mod(self, mod):
         """Installs a mod."""
+
         if mod.pseudo:
             return
 
         if self.mod_cache.contains(mod):
             self.mod_cache.fetch(mod)
         else:
-            self.mod_portal.login()
-
+            self.login_callback()
+            assert self.mod_portal.logged_in, "Must be logged in to download mods"
             self.mod_portal.download(mod)
             # TODO: process faults ^^
 

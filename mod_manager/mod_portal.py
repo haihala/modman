@@ -5,6 +5,7 @@ from .folders import mod_folder
 from .mod import Mod
 from .api_cache import ApiCache
 from .credentials import Keyring, Credentials
+from .exceptions import AuthenticationError, LoginError
 
 
 class ModPortal(object):
@@ -13,12 +14,24 @@ class ModPortal(object):
         self.manager = manager
         self.api_cache = ApiCache()
 
-    def login(self):
+    @property
+    def logged_in(self):
+        return self.api_cache.logged_in
+
+    def login(self, credentials=None):
         """Logs in to the mod portal."""
-        if self.api_cache.logged_in:
+        if self.logged_in:
             return True
 
-        return self.api_cache.login(Keyring.get_credentials() or Credentials())
+        if not credentials:
+            keyring_credentials = Keyring.get_credentials()
+            if keyring_credentials is None:
+                raise AuthenticationError
+            credentials = keyring_credentials
+
+        if not credentials.ok:
+            raise LoginError()
+        self.api_cache.login(credentials)
 
     def releases(self, mod):
         """List all releases of the mod."""
@@ -33,7 +46,7 @@ class ModPortal(object):
         return data["releases"]
 
     def download(self, mod):
-        self._download_file(mod.download_url, mod_folder.file_path(mod.url.rsplit("/", 1)[1]))
+        self._download_file(mod.download_url, mod_folder.file_path(mod.download_url.rsplit("/", 1)[1]))
 
     def _download_file(self, url, path):
         r = self.api_cache.get_zip(url)

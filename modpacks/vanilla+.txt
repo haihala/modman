@@ -5,9 +5,9 @@ EvoGUI
 FARL
 autofill
 rso-mod
-research-queue
 Bottleneck
 RailTanker
 long-reach
-Factorissimo
+Factorissimo2
 Nanobots
+auto-research

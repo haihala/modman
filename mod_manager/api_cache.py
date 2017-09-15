@@ -43,10 +43,10 @@ class ApiCache(object):
             raise LoginError()
 
         self.logged_in = True
-        return self.logged_in
 
     def reset(self):
         self.db.execute("DELETE FROM json_request_cache")
+        self.db.commit()
 
     def update(self):
         """Removes expired elements from cache."""
@@ -60,13 +60,15 @@ class ApiCache(object):
             self.db.commit()
 
     def fetch(self, path):
+        if not API_CACHE_SECONDS:
+            return None
         cur = self.db.execute("SELECT result FROM json_request_cache WHERE path=? AND datetime(expires, \"unixepoch\") >= datetime(\"now\")", (path,))
         res = cur.fetchone()
         return res[0] if res else None
 
     def get(self, url, *args, **kwargs):
         url = urljoin(FACTORIO_BASEURL, url)
-        return self.session.get(url, *args, **kwargs)
+        return self.session.get(url, timeout=10.0, *args, **kwargs)
 
     def api_get(self, url, *args, **kwargs):
         """Gets an object from factorio mod api."""
@@ -83,6 +85,11 @@ class ApiCache(object):
             return json.loads(res)
 
         data = self.get(url, *args, **kwargs).text
+        # check and minify data
+        try:
+            data = json.dumps(json.loads(data), separators=(',',':'))
+        except json.decoder.JSONDecodeError:
+            exit("Invalid JSON data in cache")
         self.store(cache_key, data)
         return json.loads(data)
 
