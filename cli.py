@@ -4,7 +4,7 @@ try:
     import requests
 except ImportError:
     print("It looks like requests is not installed.")
-    print("Try this: pip3 install requests")
+    print("Try: pip3 install requests")
     exit(1)
 
 import os
@@ -13,6 +13,7 @@ import subprocess
 from getpass import getpass
 
 import mod_manager
+from mod_manager import server
 from mod_manager.exceptions import LoginError
 
 def open_gui_editor(filename):
@@ -69,6 +70,7 @@ class CLI(object):
         "credentials <action> [args]",
         "cache <action>",
         "apicache <action>",
+        "serv_install <modpacks> [experimental]",
     ]
 
     HELP = {
@@ -86,7 +88,8 @@ class CLI(object):
         "search": "Search for mods from the Factorio mod portal. Specify the amount of results with -n parameter. By default 5 results are displayed.",
         "credentials": "Manage mod portal credentials. Actions: set, set [username] [password], clear",
         "cache": "Manage cache. Actions: reset, list",
-        "apicache": "Manage api call cache. Actions: reset"
+        "apicache": "Manage api call cache. Actions: reset",
+        "serv_install": "Installs the newest server with the chosen modpacks. If '-experimental' or '-e' are present in the command, the newest experimental release is installed."
     }
 
     ACTION_NAMES = [a.split()[0] for a in ACTIONS]
@@ -328,6 +331,16 @@ class CLI(object):
             print("Invalid arguments")
             print("Usage: apicache reset")
             exit(1)
+
+    def cmd_serv_install(self, args):
+        experimental = args[-1] in ["-e", "-experimental"]
+
+        if experimental:
+            modpacks = args[:-1]
+        else:
+            modpacks = args[:]
+
+        mod_manager.server.create_server(modpacks, experimental, self.mod_manager, self.print_progress_message)
 
     def run(self, cmd):
         if cmd == []:

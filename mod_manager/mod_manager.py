@@ -35,21 +35,21 @@ class ModManager(object):
     def decompress_modpack(self, data):
         return ModPack.decompress(self, data)
 
-    def install_mod(self, mod):
+    def install_mod(self, mod, target=None):
         """Installs a mod."""
 
         if mod.pseudo:
             return
 
         if self.mod_cache.contains(mod):
-            self.mod_cache.fetch(mod)
+            self.mod_cache.fetch(mod, target)
         else:
             self.login_callback()
             assert self.mod_portal.logged_in, "Must be logged in to download mods"
-            self.mod_portal.download(mod)
+            self.mod_portal.download(mod, target=target)
             # TODO: process faults ^^
 
-    def set_mods(self, mods, callback=None):
+    def set_mods(self, mods, callback=None, target=None):
         """
             Installs listed mods and disables others.
             Periodically calls callback with Mods and Nones.
@@ -59,11 +59,11 @@ class ModManager(object):
         for i, mod in enumerate(mods):
             callback(InstallationProgressStep(mod, True, i/(len(mods)*2)))
 
-            self.install_mod(mod)
+            self.install_mod(mod, target)
 
             callback(InstallationProgressStep(mod, False, (i+1)/(len(mods)*2)))
 
-    def install_packs(self, modpacks, callback=None):
+    def install_packs(self, modpacks, callback=None, target=None):
         """
             Installs all mods in given packages, disabling other mods.
             If mulitple versions of a mod are required, exit with an error message.
@@ -81,7 +81,7 @@ class ModManager(object):
                         # already added
                         continue
                 mods.append(mod)
-        return self.set_mods(mods, callback)
+        return self.set_mods(mods, callback, target)
 
     def install_matching(self, server, callback=None):
         """Autodetect packages on a server, and install matching mods locally."""

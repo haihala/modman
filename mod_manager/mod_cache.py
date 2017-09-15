@@ -76,13 +76,15 @@ class ModCache(object):
                 return True
         return False
 
-    def fetch(self, mod):
+    def fetch(self, mod, target=None):
         """Gets a mod from the cache and copies it to the mod folder."""
+        if target == None:
+            target = mod_folder
         self.update()
 
         for cmod in self.mods:
             if cmod.name == mod.name and cmod.version == mod.version:
-                mod_cache_folder.copy_file(cmod.filename, mod_folder)
+                mod_cache_folder.copy_file(cmod.filename, target)
                 return
 
         raise ValueError("Did not found the given mod")
@@ -111,6 +113,8 @@ class ModCache(object):
             preserve.add(newest)
 
             for version in (all_versions - preserve):
-                cmod = CachedMod(name, version)
+                # NOTE: Far too lazy to figure out what the actual issue is, so I'll assume the CachedMod constructor wants a filename
+                # cmod = CachedMod(name, version)
+                cmod = CachedMod(name + "_" + version + ".zip")
                 assert os.path.exists(cmod.path)
                 os.remove(cmod.path)
